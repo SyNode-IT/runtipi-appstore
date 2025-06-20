@@ -1,43 +1,56 @@
-# Whoami
+# Coqui TTS
 
-Tiny Go webserver that prints OS information and HTTP request to output.
+Coqui TTS est une bibliothèque de synthèse vocale (Text-to-Speech) utilisant des modèles d'apprentissage profond. Elle offre des voix naturelles et expressives pour transformer du texte en parole.
 
-## Usage
+## Fonctionnalités principales
 
-### Paths
+- **Synthèse vocale haute qualité** : Modèles pré-entraînés pour différentes langues
+- **API REST** : Interface simple pour intégration avec d'autres services
+- **Modèles multilingues** : Support de nombreuses langues incluant le français
+- **Clonage de voix** : Possibilité de créer des voix personnalisées
+- **Interface web** : Interface utilisateur simple pour tester la synthèse
 
-#### `/[?wait=d]`
+## Configuration avec N8N
 
-Returns the whoami information (request and network information).
+Cette installation est configurée pour fonctionner avec N8N dans le même réseau Runtipi. Vous pouvez utiliser l'API Coqui TTS dans vos workflows N8N via l'URL interne : `http://coqui-tts:5002`
 
-The optional `wait` query parameter can be provided to tell the server to wait before sending the response.
-The duration is expected in Go's [`time.Duration`](https://golang.org/pkg/time/#ParseDuration) format (e.g. `/?wait=100ms` to wait 100 milliseconds).
+### Endpoints API principaux
 
-The optional `env` query parameter can be set to `true` to add the environment variables to the response.
+- `GET /api/tts/models` : Liste des modèles disponibles
+- `POST /api/tts` : Génération de synthèse vocale
+- `GET /api/speakers` : Liste des voix disponibles
 
-#### `/api`
+### Exemple d'utilisation dans N8N
 
-Returns the whoami information (and some extra information) as JSON.
+```json
+{
+  "method": "POST",
+  "url": "http://coqui-tts:5002/api/tts",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "text": "Bonjour, ceci est un test de synthèse vocale",
+    "model_name": "tts_models/fr/css10/vits",
+    "speaker_id": "0"
+  }
+}
+```
 
-The optional `env` query parameter can be set to `true` to add the environment variables to the response.
+## Stockage des données
 
-#### `/bench`
+- **Modèles** : `/app/data/models` - Modèles TTS téléchargés
+- **Fichiers audio générés** : `/app/data/output` - Fichiers WAV générés
+- **Configuration** : `/app/data/config` - Fichiers de configuration personnalisés
 
-Always return the same response (`1`).
+## Remarques importantes
 
-#### `/data?size=n[&unit=u]`
+- Le premier démarrage peut prendre du temps car les modèles sont téléchargés
+- L'application nécessite des ressources importantes (CPU/RAM) pour la synthèse
+- Les modèles sont conservés entre les redémarrages via les volumes persistants
 
-Creates a response with a size `n`.
+## Support et documentation
 
-The unit of measure, if specified, accepts the following values: `KB`, `MB`, `GB`, `TB` (optional, default: bytes).
-
-#### `/echo`
-
-WebSocket echo.
-
-#### `/health`
-
-Heath check.
-
-- `GET`, `HEAD`, ...: returns a response with the status code defined by the `POST`
-- `POST`: changes the status code of the `GET` (`HEAD`, ...) response.
+- [Documentation officielle](https://tts.readthedocs.io/)
+- [Dépôt GitHub](https://github.com/coqui-ai/TTS)
+- [Modèles disponibles](https://github.com/coqui-ai/TTS/wiki/Released-Models)

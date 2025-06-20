@@ -14,7 +14,7 @@
   "url_suffix": "",
   "form_fields": [
     {
-      "type": "text",
+      "type": "number",
       "label": "Port",
       "max": 65535,
       "min": 1024,

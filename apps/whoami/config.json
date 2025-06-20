@@ -1,24 +1,36 @@
 {
-  "name": "Whoami",
-  "id": "whoami",
+  "name": "Coqui TTS",
+  "id": "coqui-tts",
   "available": true,
-  "short_desc": "Tiny Go server that prints os information and HTTP request to output.",
-  "author": "traefik",
-  "port": 8382,
-  "categories": [
-    "utilities"
+  "port": 5002,
+  "description": "Coqui TTS - Text-to-Speech synthesis with deep learning models",
+  "version": "1.0.0",
+  "tipi_version": 1,
+  "short_desc": "Open source text-to-speech synthesis",
+  "author": "Coqui AI",
+  "source": "https://github.com/coqui-ai/TTS",
+  "website": "https://coqui.ai/",
+  "categories": ["ai", "utilities"],
+  "url_suffix": "",
+  "form_fields": [
+    {
+      "type": "text",
+      "label": "Port",
+      "max": 65535,
+      "min": 1024,
+      "required": true,
+      "env_variable": "APP_PORT",
+      "default": 5002
+    },
+    {
+      "type": "text",
+      "label": "Domaine",
+      "placeholder": "coqui-tts.votredomaine.com",
+      "required": true,
+      "env_variable": "APP_DOMAIN"
+    }
   ],
-  "description": "Tiny Go webserver that prints OS information and HTTP request to output.",
-  "tipi_version": 2,
-  "version": "v1.11.0",
-  "source": "https://github.com/traefik/whoami",
-  "exposable": true,
-  "supported_architectures": [
-    "arm64",
-    "amd64"
-  ],
-  "created_at": 1745082405284,
-  "updated_at": 1745674974072,
-  "dynamic_config": true,
-  "form_fields": []
+  "supported_architectures": ["amd64", "arm64"],
+  "created_at": 1640995200,
+  "updated_at": 1640995200
 }

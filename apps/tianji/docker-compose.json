@@ -1,4 +1,5 @@
 {
+  "version": "3.8",
   "services": [
     {
       "name": "tianji",
@@ -22,7 +23,8 @@
           "condition": "service_healthy"
         }
       },
-      "restart": "always"
+      "restart": "unless-stopped",
+      "addToNetwork": true
     },
     {
       "name": "postgres",
@@ -30,7 +32,8 @@
       "environment": {
         "POSTGRES_DB": "tianji",
         "POSTGRES_USER": "tianji",
-        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}"
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}",
+        "PGDATA": "/var/lib/postgresql/data/pgdata"
       },
       "volumes": [
         {
@@ -39,12 +42,14 @@
         }
       ],
       "healthCheck": {
-        "test": "pg_isready -U tianji -d tianji || exit 1",
-        "retries": 5,
+        "test": ["CMD-SHELL", "pg_isready -U tianji -d tianji"],
         "interval": "5s",
-        "timeout": "5s"
+        "timeout": "5s",
+        "retries": 5,
+        "startPeriod": "30s"
       },
-      "restart": "always"
+      "restart": "unless-stopped",
+      "addToNetwork": true
     }
   ]
 }

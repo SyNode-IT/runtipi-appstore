@@ -9,9 +9,10 @@
   "port": 12345,
   "categories": [
     "utilities",
-    "network"
+    "analytics",
+    "monitoring"
   ],
-  "description": "Tianji réunit l’analytics sans cookies, la supervision d’uptime et l’état de vos serveurs au sein d’une application unique.",
+  "description": "Tianji réunit l'analytics sans cookies, la supervision d'uptime et l'état de vos serveurs au sein d'une application unique.",
   "tipi_version": 2,
   "version": "1.24.23",
   "exposable": true,
@@ -23,7 +24,7 @@
   "form_fields": [
     {
       "type": "random",
-      "label": "JWT secret",
+      "label": "JWT Secret",
       "min": 48,
       "required": true,
       "encoding": "hex",
@@ -31,22 +32,24 @@
     },
     {
       "type": "boolean",
-      "label": "Autoriser l’inscription (ALLOW_REGISTER)",
+      "label": "Autoriser l'inscription",
+      "hint": "Permet aux nouveaux utilisateurs de s'inscrire",
       "required": false,
       "default": false,
       "env_variable": "ALLOW_REGISTER"
     },
     {
       "type": "boolean",
-      "label": "Activer l’OpenAPI (ALLOW_OPENAPI)",
+      "label": "Activer l'API OpenAPI",
+      "hint": "Active l'interface API OpenAPI/Swagger",
       "required": false,
       "default": true,
       "env_variable": "ALLOW_OPENAPI"
     },
     {
       "type": "random",
-      "label": "Mot de passe Postgres",
-      "min": 24,
+      "label": "Mot de passe PostgreSQL",
+      "min": 32,
       "required": true,
       "encoding": "base64",
       "env_variable": "POSTGRES_PASSWORD"
@@ -54,6 +57,6 @@
   ],
   "created_at": 1756282488647,
   "updated_at": 1756282992328,
-  "min_tipi_version": "v4.0.0",
+  "min_tipi_version": "4.0.0",
   "dynamic_config": true
 }

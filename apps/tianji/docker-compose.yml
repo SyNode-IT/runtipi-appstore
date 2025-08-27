@@ -1,0 +1,46 @@
+# Format YAML pour Docker Compose standard
+version: '3.8'
+
+services:
+  tianji:
+    image: moonrailgun/tianji:1.24.23
+    container_name: tianji
+    ports:
+      - "${APP_PORT}:12345"
+    environment:
+      - DATABASE_URL=postgresql://tianji:${POSTGRES_PASSWORD}@postgres:5432/tianji?schema=public
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOW_REGISTER=${ALLOW_REGISTER}
+      - ALLOW_OPENAPI=${ALLOW_OPENAPI}
+    volumes:
+      - ${APP_DATA_DIR}/data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - tianji_network
+
+  postgres:
+    image: postgres:15.4-alpine
+    container_name: tianji_postgres
+    environment:
+      - POSTGRES_DB=tianji
+      - POSTGRES_USER=tianji
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ${APP_DATA_DIR}/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tianji -d tianji"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - tianji_network
+
+networks:
+  tianji_network:
+    driver: bridge

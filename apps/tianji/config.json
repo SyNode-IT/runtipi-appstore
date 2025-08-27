@@ -9,8 +9,7 @@
   "port": 12345,
   "categories": [
     "utilities",
-    "analytics",
-    "monitoring"
+    "network"
   ],
   "description": "Tianji réunit l'analytics sans cookies, la supervision d'uptime et l'état de vos serveurs au sein d'une application unique.",
   "tipi_version": 2,

@@ -1,0 +1,50 @@
+{
+  "services": [
+    {
+      "name": "tianji",
+      "image": "moonrailgun/tianji:1.24.23",
+      "isMain": true,
+      "internalPort": 12345,
+      "environment": {
+        "DATABASE_URL": "postgresql://tianji:${POSTGRES_PASSWORD}@postgres:5432/tianji?schema=public",
+        "JWT_SECRET": "${JWT_SECRET}",
+        "ALLOW_REGISTER": "${ALLOW_REGISTER}",
+        "ALLOW_OPENAPI": "${ALLOW_OPENAPI}"
+      },
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data",
+          "containerPath": "/app/data"
+        }
+      ],
+      "dependsOn": {
+        "postgres": {
+          "condition": "service_healthy"
+        }
+      },
+      "restart": "always"
+    },
+    {
+      "name": "postgres",
+      "image": "postgres:15.4-alpine",
+      "environment": {
+        "POSTGRES_DB": "tianji",
+        "POSTGRES_USER": "tianji",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}"
+      },
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/pgdata",
+          "containerPath": "/var/lib/postgresql/data"
+        }
+      ],
+      "healthCheck": {
+        "test": "pg_isready -U tianji -d tianji || exit 1",
+        "retries": 5,
+        "interval": "5s",
+        "timeout": "5s"
+      },
+      "restart": "always"
+    }
+  ]
+}

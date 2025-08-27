@@ -1,0 +1,59 @@
+{
+  "name": "Tianji",
+  "id": "tianji",
+  "available": true,
+  "short_desc": "Analytics web + Uptime monitor + État serveur",
+  "author": "msgbyte",
+  "source": "https://github.com/msgbyte/tianji",
+  "website": "https://tianji.dev",
+  "port": 12345,
+  "categories": [
+    "utilities",
+    "monitoring"
+  ],
+  "description": "Tianji réunit l’analytics sans cookies, la supervision d’uptime et l’état de vos serveurs au sein d’une application unique.",
+  "tipi_version": 2,
+  "version": "1.24.23",
+  "exposable": true,
+  "supported_architectures": [
+    "arm64",
+    "amd64"
+  ],
+  "dynamic": true,
+  "form_fields": [
+    {
+      "type": "random",
+      "label": "JWT secret",
+      "min": 48,
+      "required": true,
+      "encoding": "hex",
+      "env_variable": "JWT_SECRET"
+    },
+    {
+      "type": "boolean",
+      "label": "Autoriser l’inscription (ALLOW_REGISTER)",
+      "required": false,
+      "default": false,
+      "env_variable": "ALLOW_REGISTER"
+    },
+    {
+      "type": "boolean",
+      "label": "Activer l’OpenAPI (ALLOW_OPENAPI)",
+      "required": false,
+      "default": true,
+      "env_variable": "ALLOW_OPENAPI"
+    },
+    {
+      "type": "random",
+      "label": "Mot de passe Postgres",
+      "min": 24,
+      "required": true,
+      "encoding": "base64",
+      "env_variable": "POSTGRES_PASSWORD"
+    }
+  ],
+  "created_at": 1756282488647,
+  "updated_at": 1756282992328,
+  "min_tipi_version": "v4.0.0",
+  "dynamic_config": true
+}

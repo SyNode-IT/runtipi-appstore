@@ -414,13 +414,19 @@ Chaque agent doit montrer:
 
 Configuration par défaut des conteneurs:
 
-| Conteneur | RAM Min | RAM Max | CPU |
-|-----------|---------|---------|-----|
-| **Indexer** | 1GB | 4GB | 2 cores |
-| **Manager** | 512MB | 2GB | 1 core |
-| **Dashboard** | 512MB | 1GB | 1 core |
+**Indexer:**
+- Java heap: 1GB min/max (variable `OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g`)
+- Memory lock: illimité (ulimits memlock: -1)
+- File descriptors: 65536
 
-Pour modifier, éditer le fichier `docker-compose.json` section `deploy.resources.limits`.
+**Manager:**
+- Memory lock: illimité (ulimits memlock: -1)
+- File descriptors: 655360
+
+**Dashboard:**
+- Aucune limite explicite définie (utilise les limites système par défaut)
+
+**Note:** Le fichier `docker-compose.json` n'utilise pas la section `deploy.resources.limits`. Les limites sont gérées via les variables d'environnement Java et les ulimits système.
 
 ### Espace Disque
 

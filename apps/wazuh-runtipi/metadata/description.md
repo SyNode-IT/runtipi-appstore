@@ -660,7 +660,7 @@ wazuh-runtipi/
 - **Architecture simple** : Un script init par conteneur (init-certs.sh, init-indexer-init.sh, init-manager.sh, init-dashboard.sh)
 - **Configuration persistante** via symlinks vers les dossiers personnalisés
 - **Filebeat** : Configuration automatique via variables d'environnement officielles (FILEBEAT_SSL_VERIFICATION_MODE, SSL_CERTIFICATE_AUTHORITIES, SSL_CERTIFICATE, SSL_KEY)
-- **Dashboard Watchdog** surveille le démarrage et gère automatiquement les blocages de migration `.kibana_1`
+- **Manager Watchdog** : Surveille le démarrage de wazuh-db et rend ossec.conf persistant via symlink
 - **Sécurité OpenSearch** : Les 8 fichiers dans `indexer-security/` sont automatiquement copiés au premier démarrage et **préservés** lors des mises à jour
 
 ---
@@ -699,9 +699,11 @@ done
 
 **init-manager.sh** :
 ```bash
-# Vérifie existence ET contenu du fichier ossec.conf
+# Attend que le processus wazuh-db soit démarré
 while [ $ELAPSED -lt $TIMEOUT ]; do
-    if [ -f "$OSSEC_DEFAULT" ] && [ -s "$OSSEC_DEFAULT" ]; then
+    if pgrep -x "wazuh-db" > /dev/null 2>&1; then
+        # wazuh-db running, attendre 5s pour stabilité
+        sleep 5
         break
     fi
     sleep 2
@@ -710,15 +712,9 @@ done
 
 **init-dashboard.sh** :
 ```bash
-# Vérifie l'API dashboard toutes les 10s (au lieu de 60s fixes)
-# Détecte le temps réel de blocage migration avant intervention
-while [ $ELAPSED -lt $TIMEOUT ]; do
-    API_STATUS=$(curl -sk https://localhost:5601/api/status)
-    if [[ "$API_STATUS" == "200" ]]; then
-        break
-    fi
-    sleep 10
-done
+# Pas de watchdog - exécute simplement l'entrypoint officiel
+# La configuration est créée via symlink vers opensearch_dashboards.yml
+exec /entrypoint.sh
 ```
 
 Cette approche garantit :
@@ -726,16 +722,16 @@ Cette approche garantit :
 - ⏱️ **Patience suffisante** sur machines plus lentes
 - 📊 **Logs précis** avec temps réels écoulés
 
-### Gestion de la Migration Dashboard
+### Gestion de la Persistance Manager
 
-Le watchdog du dashboard détecte et corrige automatiquement le problème connu de blocage de migration `.kibana_1` :
+Le watchdog du manager (init-manager.sh) rend la configuration ossec.conf persistante :
 
-1. **Détection** : Vérifie la présence de l'index `.kibana_1` toutes les 10 secondes
-2. **Patience** : Attend 180 secondes (3 minutes) avant d'intervenir
-3. **Intervention** : Supprime l'index bloqué si nécessaire
-4. **Restart** : Laisse Runtipi redémarrer automatiquement le dashboard
+1. **Attente** : Surveille le démarrage du processus wazuh-db (un des derniers services à démarrer)
+2. **Stabilité** : Attend 5 secondes supplémentaires après détection du processus
+3. **Persistance** : Copie ossec.conf vers /var/ossec/etc/custom/ si nécessaire
+4. **Symlink** : Crée un lien symbolique pour garantir la persistance entre redémarrages
 
-Cette logique évite les interventions prématurées tout en garantissant un démarrage réussi.
+Cette logique garantit que les modifications de configuration survivent aux redémarrages de conteneurs.
 
 ---
 

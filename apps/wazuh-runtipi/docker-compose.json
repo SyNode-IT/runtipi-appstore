@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 2,
+  "services": [
+    {
+      "name": "wazuh-certs",
+      "image": "wazuh/wazuh-certs-generator:0.0.3",
+      "hostname": "wazuh-certs-generator",
+      "entrypoint": [
+        "sh",
+        "/scripts/init-certs.sh"
+      ],
+      "environment": [
+        {
+          "key": "CERT_TOOL_VERSION",
+          "value": "4.14"
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config",
+          "containerPath": "/config"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config/wazuh_ssl_certs",
+          "containerPath": "/certificates"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/indexer-data",
+          "containerPath": "/indexer-data"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-api",
+          "containerPath": "/manager-api"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-logs",
+          "containerPath": "/manager-logs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-queue",
+          "containerPath": "/manager-queue"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/dashboard-config",
+          "containerPath": "/dashboard-config"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/indexer-security",
+          "containerPath": "/indexer-security"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/scripts",
+          "containerPath": "/scripts"
+        }
+      ],
+      "healthCheck": {
+        "test": "test -f /certificates/root-ca.pem",
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 10
+      }
+    },
+    {
+      "name": "wazuh-indexer",
+      "image": "wazuh/wazuh-indexer:4.14.1",
+      "hostname": "wazuh.indexer",
+      "user": "1000:1000",
+      "depends_on": {
+        "wazuh-certs": {
+          "condition": "service_healthy"
+        }
+      },
+      "environment": [
+        {
+          "key": "OPENSEARCH_JAVA_OPTS",
+          "value": "-Xms1g -Xmx1g"
+        },
+        {
+          "key": "bootstrap.memory_lock",
+          "value": "true"
+        },
+        {
+          "key": "network.host",
+          "value": "wazuh.indexer"
+        },
+        {
+          "key": "node.name",
+          "value": "wazuh.indexer"
+        },
+        {
+          "key": "cluster.initial_cluster_manager_nodes",
+          "value": "wazuh.indexer"
+        },
+        {
+          "key": "node.max_local_storage_nodes",
+          "value": "1"
+        },
+        {
+          "key": "plugins.security.allow_default_init_securityindex",
+          "value": "true"
+        },
+        {
+          "key": "NODES_DN",
+          "value": "CN=wazuh.indexer,OU=Wazuh,O=Wazuh,L=California,C=US"
+        },
+        {
+          "key": "plugins.security.ssl.http.clientauth_mode",
+          "value": "OPTIONAL"
+        }
+      ],
+      "ulimits": {
+        "memlock": {
+          "soft": -1,
+          "hard": -1
+        },
+        "nofile": {
+          "soft": 65536,
+          "hard": 65536
+        }
+      },
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/indexer-data",
+          "containerPath": "/var/lib/wazuh-indexer"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config/wazuh_ssl_certs",
+          "containerPath": "/usr/share/wazuh-indexer/config/certs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/indexer-security",
+          "containerPath": "/usr/share/wazuh-indexer/opensearch-security"
+        }
+      ],
+      "healthCheck": {
+        "test": "curl -ks https://wazuh.indexer:9200 -u ${INDEXER_USERNAME:-admin}:${INDEXER_PASSWORD:-admin}",
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 15,
+        "startPeriod": "120s"
+      }
+    },
+    {
+      "name": "wazuh-indexer-init",
+      "image": "wazuh/wazuh-indexer:4.14.1",
+      "hostname": "wazuh-indexer-init",
+      "depends_on": {
+        "wazuh-indexer": {
+          "condition": "service_healthy"
+        }
+      },
+      "entrypoint": [
+        "bash",
+        "/scripts/init-indexer-init.sh"
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config/wazuh_ssl_certs",
+          "containerPath": "/usr/share/wazuh-indexer/config/certs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/indexer-security",
+          "containerPath": "/mnt/host-security"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/scripts",
+          "containerPath": "/scripts"
+        }
+      ],
+      "healthCheck": {
+        "test": "test -f /mnt/host-security/.init-complete",
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 60,
+        "startPeriod": "120s"
+      }
+    },
+    {
+      "name": "wazuh-manager",
+      "image": "wazuh/wazuh-manager:4.14.1",
+      "hostname": "wazuh.manager",
+      "entrypoint": [
+        "bash",
+        "/scripts/init-manager.sh"
+      ],
+      "depends_on": {
+        "wazuh-indexer-init": {
+          "condition": "service_healthy"
+        }
+      },
+      "environment": [
+        {
+          "key": "WAZUH_INDEXER_HOSTS",
+          "value": "wazuh.indexer:9200"
+        },
+        {
+          "key": "WAZUH_NODE_NAME",
+          "value": "manager"
+        },
+        {
+          "key": "WAZUH_CLUSTER_NODES",
+          "value": "wazuh.manager"
+        },
+        {
+          "key": "WAZUH_CLUSTER_BIND_ADDR",
+          "value": "wazuh.manager"
+        },
+        {
+          "key": "INDEXER_URL",
+          "value": "https://wazuh.indexer:9200"
+        },
+        {
+          "key": "INDEXER_USERNAME",
+          "value": "${INDEXER_USERNAME:-admin}"
+        },
+        {
+          "key": "INDEXER_PASSWORD",
+          "value": "${INDEXER_PASSWORD:-admin}"
+        },
+        {
+          "key": "FILEBEAT_SSL_VERIFICATION_MODE",
+          "value": "full"
+        },
+        {
+          "key": "SSL_CERTIFICATE_AUTHORITIES",
+          "value": "/var/ossec/etc/certs/root-ca.pem"
+        },
+        {
+          "key": "SSL_CERTIFICATE",
+          "value": "/var/ossec/etc/certs/server.pem"
+        },
+        {
+          "key": "SSL_KEY",
+          "value": "/var/ossec/etc/certs/server-key.pem"
+        },
+        {
+          "key": "API_USERNAME",
+          "value": "wazuh-wui"
+        },
+        {
+          "key": "API_PASSWORD",
+          "value": "${API_PASSWORD:-MyS3cr37P450r.*-}"
+        }
+      ],
+      "ulimits": {
+        "memlock": {
+          "soft": -1,
+          "hard": -1
+        },
+        "nofile": {
+          "soft": 655360,
+          "hard": 655360
+        }
+      },
+      "addPorts": [
+        {
+          "containerPort": 1514,
+          "hostPort": 1514,
+          "tcp": true
+        },
+        {
+          "containerPort": 1515,
+          "hostPort": 1515,
+          "tcp": true
+        },
+        {
+          "containerPort": 514,
+          "hostPort": 514,
+          "udp": true
+        },
+        {
+          "containerPort": 55000,
+          "hostPort": 55000,
+          "tcp": true
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-api",
+          "containerPath": "/var/ossec/api/configuration"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-etc",
+          "containerPath": "/var/ossec/etc/custom"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-logs",
+          "containerPath": "/var/ossec/logs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-queue",
+          "containerPath": "/var/ossec/queue"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config/wazuh_ssl_certs",
+          "containerPath": "/var/ossec/etc/certs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/scripts",
+          "containerPath": "/scripts"
+        }
+      ],
+      "healthCheck": {
+        "test": "/var/ossec/bin/wazuh-control status | grep -E 'wazuh-db is running|wazuh-analysisd is running|wazuh-remoted is running' | wc -l | grep -q 3",
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 10,
+        "startPeriod": "180s"
+      }
+    },
+    {
+      "name": "wazuh-dashboard",
+      "image": "wazuh/wazuh-dashboard:4.14.1",
+      "hostname": "wazuh.dashboard",
+      "entrypoint": [
+        "bash",
+        "/scripts/init-dashboard.sh"
+      ],
+      "isMain": true,
+      "internalPort": "5601",
+      "depends_on": {
+        "wazuh-indexer-init": {
+          "condition": "service_healthy"
+        },
+        "wazuh-manager": {
+          "condition": "service_healthy"
+        }
+      },
+      "environment": [
+        {
+          "key": "SERVER_HOST",
+          "value": "0.0.0.0"
+        },
+        {
+          "key": "OPENSEARCH_HOSTS",
+          "value": "https://wazuh.indexer:9200"
+        },
+        {
+          "key": "INDEXER_USERNAME",
+          "value": "${INDEXER_USERNAME:-admin}"
+        },
+        {
+          "key": "INDEXER_PASSWORD",
+          "value": "${INDEXER_PASSWORD:-admin}"
+        },
+        {
+          "key": "WAZUH_API_URL",
+          "value": "https://wazuh.manager"
+        },
+        {
+          "key": "DASHBOARD_USERNAME",
+          "value": "${DASHBOARD_USERNAME:-kibanaserver}"
+        },
+        {
+          "key": "DASHBOARD_PASSWORD",
+          "value": "${DASHBOARD_PASSWORD:-kibanaserver}"
+        },
+        {
+          "key": "API_USERNAME",
+          "value": "wazuh-wui"
+        },
+        {
+          "key": "API_PASSWORD",
+          "value": "${API_PASSWORD:-MyS3cr37P450r.*-}"
+        },
+        {
+          "key": "SERVER_SSL_CERTIFICATE",
+          "value": "/usr/share/wazuh-dashboard/config/certs/dashboard.pem"
+        },
+        {
+          "key": "SERVER_SSL_KEY",
+          "value": "/usr/share/wazuh-dashboard/config/certs/dashboard-key.pem"
+        },
+        {
+          "key": "OPENSEARCH_SSL_CERTIFICATE_AUTHORITIES",
+          "value": "/usr/share/wazuh-dashboard/config/certs/root-ca.pem"
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config/wazuh_ssl_certs",
+          "containerPath": "/usr/share/wazuh-dashboard/config/certs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/dashboard-config",
+          "containerPath": "/usr/share/wazuh-dashboard/config/custom"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/dashboard-custom",
+          "containerPath": "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/scripts",
+          "containerPath": "/scripts"
+        }
+      ],
+      "healthCheck": {
+        "test": "curl -ks https://localhost:5601/app/wazuh -o /dev/null -w '%{http_code}' | grep -qE '302|200' || exit 1",
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 15,
+        "startPeriod": "240s"
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "Wazuh",
+  "id": "wazuh",
+  "available": true,
+  "exposable": true,
+  "dynamic_config": true,
+  "port": 5601,
+  "tipi_version": 2,
+  "version": "4.14.1",
+  "categories": ["security"],
+  "short_desc": "Plateforme XDR / SIEM open source.",
+  "description": "Wazuh est une plateforme de sécurité open source (XDR / SIEM) qui déploie la stack Docker single-node officielle : indexer, manager et dashboard Wazuh 4.14.1.",
+  "author": "Wazuh",
+  "source": "https://github.com/wazuh/wazuh-docker",
+  "website": "https://wazuh.com/",
+  "form_fields": [
+    {
+      "type": "text",
+      "env_variable": "INDEXER_USERNAME",
+      "label": "Indexer admin username",
+      "default": "admin",
+      "required": true
+    },
+    {
+      "type": "password",
+      "env_variable": "INDEXER_PASSWORD",
+      "label": "Indexer admin password",
+      "default": "admin",
+      "required": true
+    },
+    {
+      "type": "text",
+      "env_variable": "DASHBOARD_USERNAME",
+      "label": "Dashboard username (internal OpenSearch user)",
+      "default": "kibanaserver",
+      "required": true
+    },
+    {
+      "type": "password",
+      "env_variable": "DASHBOARD_PASSWORD",
+      "label": "Dashboard password (internal OpenSearch user)",
+      "default": "kibanaserver",
+      "required": true
+    },
+    {
+      "type": "password",
+      "env_variable": "API_PASSWORD",
+      "label": "Wazuh API password (user: wazuh-wui)",
+      "default": "MyS3cr37P450r.*-",
+      "required": true
+    }
+  ],
+  "supported_architectures": [
+    "amd64",
+    "arm64"
+  ]
+}

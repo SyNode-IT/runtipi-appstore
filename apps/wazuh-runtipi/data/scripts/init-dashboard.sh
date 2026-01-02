@@ -46,5 +46,13 @@ fi
 
 echo "DASHBOARD_INIT: Configuration complete, starting dashboard..."
 
+# Remove keystore to avoid interactive prompt on fresh installs
+# The official entrypoint will recreate it automatically without prompting
+KEYSTORE_PATH="/usr/share/wazuh-dashboard/config/opensearch_dashboards.keystore"
+if [ -f "$KEYSTORE_PATH" ]; then
+    echo "DASHBOARD_INIT: Removing existing keystore to avoid interactive prompt..."
+    rm -f "$KEYSTORE_PATH"
+fi
+
 # Just exec the official entrypoint - let it handle everything!
 exec /entrypoint.sh

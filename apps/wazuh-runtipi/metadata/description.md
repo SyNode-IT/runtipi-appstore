@@ -245,7 +245,7 @@ bash /opt/runtipi/app-data/*/wazuh-runtipi/data/debug/wazuh-health-check.sh
 
 **Ce script vérifie automatiquement:**
 - ✅ Santé de tous les services (healthy/unhealthy)
-- ✅ Utilisation disque (~7-8GB attendu pour installation fraîche)
+- ✅ Utilisation disque (7 GB attendu pour installation fraîche)
 - ✅ Présence des 8 fichiers de sécurité OpenSearch
 - ✅ Connectivité réseau entre conteneurs
 - ✅ Configuration du dashboard et manager
@@ -430,7 +430,7 @@ Configuration par défaut des conteneurs:
 
 ### Espace Disque
 
-Utilisation disque normale: **~7-8GB** pour une installation fraîche
+Utilisation disque normale: **7 GB** pour une installation fraîche
 
 L'espace augmente avec:
 - Nombre d'agents connectés

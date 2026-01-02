@@ -187,12 +187,12 @@ if [ -d "$DATA_DIR" ] && [ -n "$DATA_DIR" ]; then
     echo -ne "  Size: $SIZE_HUMAN ($SIZE_GB GB) - "
 
     if [ "$SIZE_GB" -gt 40 ]; then
-        echo -e "${RED}⚠ WARNING: Excessive size! Expected ~5GB${NC}"
+        echo -e "${RED}⚠ WARNING: Excessive size! Expected 7 GB${NC}"
         echo -e "  ${YELLOW}Possible indexer infinite loop - check Bug #1${NC}"
     elif [ "$SIZE_GB" -gt 20 ]; then
-        echo -e "${YELLOW}⚠ INFO: Higher than expected (~5GB)${NC}"
+        echo -e "${YELLOW}⚠ INFO: Higher than expected (7 GB)${NC}"
     else
-        echo -e "${GREEN}✓ OK (expected ~5GB)${NC}"
+        echo -e "${GREEN}✓ OK (expected 7 GB)${NC}"
     fi
 else
     echo -e "${RED}✗ Data directory not found: $DATA_DIR${NC}"
@@ -537,7 +537,7 @@ if [ -n "$SIZE_GB" ] && [ "$SIZE_GB" -gt 20 ]; then
     echo -e "${YELLOW}⚠ Disk: Higher than expected usage ($SIZE_GB GB)${NC}"
     ((ISSUES++))
 elif [ -n "$SIZE_GB" ]; then
-    echo -e "${GREEN}✓ Disk: Usage normal (~5GB)${NC}"
+    echo -e "${GREEN}✓ Disk: Usage normal (7 GB)${NC}"
 else
     echo -e "${YELLOW}⚠ Disk: Could not determine usage${NC}"
 fi

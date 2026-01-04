@@ -213,18 +213,21 @@ Si vous utilisez les valeurs par défaut:
 
    ⚠️ **IMPORTANT:** Copiez le hash complet (commence par `$2y$12$...`). Vous en aurez besoin à l'étape suivante.
 
-3. **Trouver le chemin exact du fichier de configuration:**
+3. **Éditer le fichier internal_users.yml:**
+
+   Le wildcard `*` fonctionne directement avec nano:
+   ```bash
+   nano /opt/runtipi/app-data/*/wazuh-runtipi/data/indexer-security/internal_users.yml
+   ```
+
+   **Note:** Si le wildcard `*` ne fonctionne pas, trouvez d'abord le chemin exact:
    ```bash
    # Afficher le chemin complet
    ls -d /opt/runtipi/app-data/*/wazuh-runtipi
-   ```
+   # Exemple de résultat: /opt/runtipi/app-data/abc123/wazuh-runtipi
 
-   Utilisez ce chemin pour les commandes suivantes (remplacez `*` par l'ID exact).
-
-4. **Éditer le fichier internal_users.yml:**
-   ```bash
-   # Ouvrir le fichier avec nano
-   nano /opt/runtipi/app-data/VOTRE_ID/wazuh-runtipi/data/indexer-security/internal_users.yml
+   # Puis utiliser ce chemin exact
+   nano /opt/runtipi/app-data/abc123/wazuh-runtipi/data/indexer-security/internal_users.yml
    ```
 
    **Pour changer le mot de passe admin:**

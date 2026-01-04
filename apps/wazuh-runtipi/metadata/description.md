@@ -101,8 +101,10 @@ Ce projet déploie une stack Wazuh complète sur Runtipi avec 5 conteneurs Docke
 ### Prérequis
 
 - **Runtipi 4.6.5+** installé et fonctionnel
-- **4GB RAM minimum** (8GB recommandés)
-- **20GB espace disque** disponible
+- **Ressources minimales:**
+  - **CPU:** 2 cores minimum (4 cores recommandés)
+  - **RAM:** 4GB minimum (8GB recommandés pour production)
+  - **Disque:** 20GB minimum (60GB+ recommandé pour production avec agents)
 - **Accès root** au serveur Runtipi
 
 **⚠️ IMPORTANT - Configuration système requise:**
@@ -410,32 +412,78 @@ Chaque agent doit montrer:
 
 **Note:** Seul les ports **5601**, **1514**, **1515** (Dashboard et les agents) sont à exposer publiquement. Les autres ports sont utilisés pour la communication interne entre les composants Wazuh et les agents.
 
-### Limites de Ressources
+### Variables d'Environnement Techniques
 
-Configuration par défaut des conteneurs:
+En plus des variables de configuration utilisateur, le déploiement utilise ces variables techniques (configurées automatiquement):
 
 **Indexer:**
-- Java heap: 1GB min/max (variable `OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g`)
-- Memory lock: illimité (ulimits memlock: -1)
-- File descriptors: 65536
+- `OPENSEARCH_JAVA_OPTS`: `-Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true`
+  - Configure le heap Java (1GB) et active la protection contre la vulnérabilité Log4j
+- `DISABLE_INSTALL_DEMO_CONFIG`: `true`
+  - Désactive la configuration de démonstration (sécurité)
+- `bootstrap.memory_lock`: `true`
+  - Verrouille la mémoire pour éviter le swapping (performance)
 
 **Manager:**
-- Memory lock: illimité (ulimits memlock: -1)
-- File descriptors: 655360
+- `WAZUH_NODE_TYPE`: `master`
+  - Définit explicitement le type de nœud (single-node deployment)
+- `FILEBEAT_SSL_VERIFICATION_MODE`: `full`
+  - Active la vérification SSL complète pour Filebeat
+- `SSL_CERTIFICATE_AUTHORITIES`, `SSL_CERTIFICATE`, `SSL_KEY`
+  - Chemins vers les certificats SSL générés automatiquement
 
 **Dashboard:**
-- Aucune limite explicite définie (utilise les limites système par défaut)
+- `SERVER_SSL_ENABLED`: `true`
+  - Active explicitement le SSL pour le serveur web
+- `SERVER_SSL_CERTIFICATE`, `SERVER_SSL_KEY`
+  - Certificats SSL pour HTTPS
 
-**Note:** Le fichier `docker-compose.json` n'utilise pas la section `deploy.resources.limits`. Les limites sont gérées via les variables d'environnement Java et les ulimits système.
+**Note de sécurité:** Le flag `-Dlog4j2.formatMsgNoLookups=true` protège contre CVE-2021-44228 (Log4Shell). Cette configuration suit les recommandations de sécurité officielles de Wazuh.
+
+### Limites de Ressources
+
+Configuration par défaut des conteneurs basée sur les recommandations Kubernetes de Wazuh:
+
+**Indexer:**
+- **CPU:** Réservé: 0.5 / Limite: 1.0 core
+- **RAM:** Réservé: 1GB / Limite: 2GB
+- Java heap: 1GB min/max (variable `OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true`)
+- Memory lock: illimité (ulimits memlock: -1)
+- File descriptors: 65536
+- **Sécurité:** Log4j vulnerability mitigation activé
+
+**Manager:**
+- **CPU:** Réservé: 1.0 / Limite: 2.0 cores
+- **RAM:** Réservé: 1GB / Limite: 2GB
+- Memory lock: illimité (ulimits memlock: -1)
+- File descriptors: 655360
+- **Type de nœud:** Master (single-node deployment)
+
+**Dashboard:**
+- **CPU:** Réservé: 0.2 / Limite: 0.4 core
+- **RAM:** Réservé: 512MB / Limite: 2GB
+- **SSL:** Activé explicitement via `SERVER_SSL_ENABLED: true`
+
+**Note:** Ces limites sont configurées dans la section `deploy.resources` du fichier `docker-compose.json`. Les limites CPU et RAM sont basées sur les configurations de production Kubernetes de Wazuh pour assurer une stabilité optimale.
 
 ### Espace Disque
 
-Utilisation disque normale: **7 GB** pour une installation fraîche
+**Utilisation disque:**
+- Installation fraîche: **7 GB**
+- **Production recommandée (basée sur les configurations Kubernetes):**
+  - **Indexer:** 10Gi minimum pour stockage des indices OpenSearch
+  - **Manager:** 50Gi minimum pour logs, queue et données d'agents
+  - **Dashboard:** Aucun stockage persistant requis (service sans état)
 
 L'espace augmente avec:
 - Nombre d'agents connectés
 - Volume d'événements générés
 - Période de rétention des logs (7 jours par défaut)
+
+**Volumes critiques à sauvegarder:**
+- `indexer-data` - État du cluster et indices OpenSearch
+- `manager-logs` - Logs d'événements de sécurité
+- `manager-queue` - Queue de données des agents
 
 Pour surveiller:
 ```bash
@@ -444,6 +492,11 @@ du -sh /opt/runtipi/app-data/*/wazuh-runtipi
 
 # Vérifier uniquement les données persistantes
 du -sh /opt/runtipi/app-data/*/wazuh-runtipi/data
+
+# Vérifier par composant
+du -sh /opt/runtipi/app-data/*/wazuh-runtipi/data/indexer-data
+du -sh /opt/runtipi/app-data/*/wazuh-runtipi/data/manager-logs
+du -sh /opt/runtipi/app-data/*/wazuh-runtipi/data/manager-queue
 ```
 
 ### Personnalisation du Manager
@@ -668,6 +721,98 @@ wazuh-runtipi/
 - **Filebeat** : Configuration automatique via variables d'environnement officielles (FILEBEAT_SSL_VERIFICATION_MODE, SSL_CERTIFICATE_AUTHORITIES, SSL_CERTIFICATE, SSL_KEY)
 - **Manager Watchdog** : Surveille le démarrage de wazuh-db et rend ossec.conf persistant via symlink
 - **Sécurité OpenSearch** : Les 8 fichiers dans `indexer-security/` sont automatiquement copiés au premier démarrage et **préservés** lors des mises à jour
+
+---
+
+## 📊 Considérations de Production et Scaling
+
+### Limitations du Déploiement Single-Node
+
+Ce déploiement est optimisé pour les **environnements de petite à moyenne taille**:
+
+**✅ Adapté pour:**
+- PME avec 10-50 agents
+- Environnements de test/développement
+- Labs de sécurité personnels
+- Monitoring de petites infrastructures
+
+**⚠️ Non recommandé pour:**
+- Grandes entreprises (>100 agents)
+- Environnements critiques nécessitant haute disponibilité
+- Charges de travail très élevées (>10000 événements/seconde)
+
+### Haute Disponibilité (HA)
+
+Pour des déploiements haute disponibilité, Wazuh recommande Kubernetes avec:
+
+**Configuration HA recommandée (basée sur wazuh-kubernetes):**
+- **Indexer:** 3 nœuds en cluster (quorum)
+- **Manager:** 1 Master + 2+ Workers avec pod anti-affinity
+- **Dashboard:** 2+ réplicas avec load balancing
+- **Network Policies:** Segmentation réseau zero-trust
+- **Persistent Volumes:** Stockage distribué (EBS, Ceph, etc.)
+
+**Référence:** Le dossier `data/ressources/wazuh-kubernetes-main/` contient les configurations officielles Kubernetes de Wazuh pour déploiements HA.
+
+### Recommandations de Scaling
+
+Si vous atteignez les limites du déploiement single-node:
+
+1. **Migration vers Kubernetes**
+   - Utilisez les manifests dans `wazuh-kubernetes-main/`
+   - Configurations pré-configurées pour AWS EKS, GKE, AKS
+   - Support pour multi-nodes et auto-scaling
+
+2. **Optimisation du Déploiement Actuel**
+   - Augmentez les ressources CPU/RAM si nécessaire
+   - Ajustez la période de rétention des logs
+   - Configurez l'archivage des anciens événements
+   - Optimisez les règles de détection (désactiver celles non utilisées)
+
+3. **Monitoring des Performances**
+   ```bash
+   # Surveiller l'utilisation du CPU/RAM
+   docker stats
+
+   # Vérifier la santé du cluster OpenSearch
+   curl -k -u admin:admin https://localhost:9200/_cluster/health?pretty
+
+   # Analyser les logs du manager
+   docker logs wazuh-runtipi-wazuh-manager-1
+   ```
+
+### Sécurité en Production
+
+**✅ Checklist de sécurité:**
+- [ ] Changer TOUS les mots de passe par défaut
+- [ ] Activer le pare-feu (exposer uniquement ports 5601, 1514, 1515)
+- [ ] Configurer HTTPS avec certificats valides (non auto-signés)
+- [ ] Limiter les accès SSH au serveur
+- [ ] Activer les backups automatiques des volumes critiques
+- [ ] Configurer la rotation des logs
+- [ ] Activer l'authentification multi-facteurs si possible
+- [ ] Surveiller les alertes de sécurité Wazuh pour le serveur lui-même
+
+**Backup recommandé:**
+```bash
+# Script de backup des volumes critiques
+BACKUP_DIR="/backup/wazuh-$(date +%Y%m%d)"
+mkdir -p "$BACKUP_DIR"
+
+# Indexer data
+tar czf "$BACKUP_DIR/indexer-data.tar.gz" \
+  /opt/runtipi/app-data/*/wazuh-runtipi/data/indexer-data
+
+# Manager logs et queue
+tar czf "$BACKUP_DIR/manager-data.tar.gz" \
+  /opt/runtipi/app-data/*/wazuh-runtipi/data/manager-logs \
+  /opt/runtipi/app-data/*/wazuh-runtipi/data/manager-queue
+
+# Security configs
+tar czf "$BACKUP_DIR/security-config.tar.gz" \
+  /opt/runtipi/app-data/*/wazuh-runtipi/data/indexer-security \
+  /opt/runtipi/app-data/*/wazuh-runtipi/data/config
+```
 
 ---
 

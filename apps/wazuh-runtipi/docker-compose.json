@@ -73,7 +73,11 @@
       "environment": [
         {
           "key": "OPENSEARCH_JAVA_OPTS",
-          "value": "-Xms1g -Xmx1g"
+          "value": "-Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true"
+        },
+        {
+          "key": "DISABLE_INSTALL_DEMO_CONFIG",
+          "value": "true"
         },
         {
           "key": "bootstrap.memory_lock",
@@ -116,6 +120,18 @@
         "nofile": {
           "soft": 65536,
           "hard": 65536
+        }
+      },
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "1.0",
+            "memory": "2G"
+          },
+          "reservations": {
+            "cpus": "0.5",
+            "memory": "1G"
+          }
         }
       },
       "volumes": [
@@ -198,6 +214,10 @@
           "value": "manager"
         },
         {
+          "key": "WAZUH_NODE_TYPE",
+          "value": "master"
+        },
+        {
           "key": "WAZUH_CLUSTER_NODES",
           "value": "wazuh.manager"
         },
@@ -250,6 +270,18 @@
         "nofile": {
           "soft": 655360,
           "hard": 655360
+        }
+      },
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "2.0",
+            "memory": "2G"
+          },
+          "reservations": {
+            "cpus": "1.0",
+            "memory": "1G"
+          }
         }
       },
       "addPorts": [
@@ -336,6 +368,10 @@
           "value": "https://wazuh.indexer:9200"
         },
         {
+          "key": "SERVER_SSL_ENABLED",
+          "value": "true"
+        },
+        {
           "key": "INDEXER_USERNAME",
           "value": "${INDEXER_USERNAME:-admin}"
         },
@@ -394,6 +430,18 @@
           "containerPath": "/scripts"
         }
       ],
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "0.4",
+            "memory": "2G"
+          },
+          "reservations": {
+            "cpus": "0.2",
+            "memory": "512M"
+          }
+        }
+      },
       "healthCheck": {
         "test": "curl -ks https://localhost:5601/app/wazuh -o /dev/null -w '%{http_code}' | grep -qE '302|200' || exit 1",
         "interval": "30s",

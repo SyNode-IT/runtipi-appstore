@@ -332,11 +332,11 @@ Si vous utilisez les valeurs par défaut:
    ```bash
    # Remplacer l'ancien mot de passe par le nouveau dans wazuh.yml
    docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
-     "sed -i 's|password: \"MyS3cr37P450r\.\*-\"|password: \"VOTRE_NOUVEAU_MOT_DE_PASSE\"|g' \
+     "sed -i 's|password: MyS3cr37P450r\.\*-|password: VOTRE_NOUVEAU_MOT_DE_PASSE|g' \
      /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml"
    ```
 
-   **⚠️ IMPORTANT:** Remplacez `VOTRE_NOUVEAU_MOT_DE_PASSE` par votre mot de passe réel
+   **⚠️ IMPORTANT:** Remplacez `VOTRE_NOUVEAU_MOT_DE_PASSE` par votre mot de passe réel (sans guillemets)
 
    **Vérifier que le changement a été effectué:**
    ```bash
@@ -354,8 +354,8 @@ Si vous utilisez les valeurs par défaut:
    # Afficher le fichier pour voir son contenu
    cat /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 
-   # Utiliser sed directement dans le conteneur
-   sed -i 's|password: "MyS3cr37P450r\.\*-"|password: "VOTRE_NOUVEAU_MOT_DE_PASSE"|g' \
+   # Utiliser sed directement dans le conteneur (sans guillemets)
+   sed -i 's|password: MyS3cr37P450r\.\*-|password: VOTRE_NOUVEAU_MOT_DE_PASSE|g' \
      /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 
    # Vérifier le changement

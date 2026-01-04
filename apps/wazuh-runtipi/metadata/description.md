@@ -186,6 +186,8 @@ Si vous utilisez les valeurs par défaut:
 
 ### Étape 4: Changer les Mots de Passe (Recommandé pour Production)
 
+⚠️ **Source officielle:** [Wazuh Documentation - Changing Default Passwords](https://documentation.wazuh.com/current/deployment-options/docker/changing-default-password.html)
+
 #### Méthode 1: Avant l'Installation (Recommandé)
 
 La manière la plus sûre est de définir des mots de passe forts **avant** l'installation via l'interface Runtipi:
@@ -195,39 +197,63 @@ La manière la plus sûre est de définir des mots de passe forts **avant** l'in
    - `INDEXER_PASSWORD` - Mot de passe admin de l'indexer (au lieu de "admin")
    - `DASHBOARD_PASSWORD` - Mot de passe dashboard→indexer (au lieu de "kibanaserver")
    - `API_PASSWORD` - Mot de passe API REST (au lieu de "MyS3cr37P450r.*-")
-3. Utiliser des mots de passe forts (minimum 12 caractères, majuscules, minuscules, chiffres, symboles)
+3. Utiliser des mots de passe forts:
+   - **Indexer/Dashboard:** Minimum 8 caractères
+   - **API:** 8-64 caractères avec majuscules, minuscules, chiffres ET symboles
 4. Procéder à l'installation
 
-#### Méthode 2: Après l'Installation
+#### Méthode 2: Après l'Installation (Méthode Officielle Wazuh)
 
-Si vous avez déjà installé Wazuh avec les mots de passe par défaut, vous devez les changer:
+Si vous avez déjà installé Wazuh avec les mots de passe par défaut, suivez la procédure officielle :
 
-**A. Changer le mot de passe admin du dashboard:**
+**A. Changer le mot de passe des utilisateurs Indexer (admin/kibanaserver):**
 
-1. Se connecter au dashboard: `https://VOTRE_IP:5601`
-2. Login: `admin` / `admin`
-3. Cliquer sur le menu **☰** (hamburger) en haut à gauche
-4. Aller dans **Security → Internal users**
-5. Cliquer sur l'utilisateur **admin**
-6. Cliquer sur **Edit**
-7. Entrer un **nouveau mot de passe fort**
-8. Cliquer sur **Save**
+1. **Se déconnecter du dashboard** pour éviter les conflits de session
 
-**B. Mettre à jour les variables d'environnement dans Runtipi:**
+2. **Générer le hash du nouveau mot de passe:**
+   ```bash
+   docker run --rm -ti wazuh/wazuh-indexer:4.14.1 bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/hash.sh
+   ```
+   Entrez votre nouveau mot de passe et copiez le hash généré.
 
-1. Dans l'interface Runtipi, aller dans l'application Wazuh
-2. Cliquer sur "Settings" ou "Configuration"
-3. Mettre à jour `INDEXER_PASSWORD` avec le nouveau mot de passe
-4. Redémarrer l'application pour appliquer les changements
+3. **Mettre à jour internal_users.yml:**
+   ```bash
+   # Éditer le fichier de sécurité
+   nano /opt/runtipi/app-data/*/wazuh-runtipi/data/indexer-security/internal_users.yml
+   ```
 
-**C. Changer les autres utilisateurs internes (optionnel mais recommandé):**
+   Remplacez le hash de l'utilisateur cible (admin ou kibanaserver).
 
-Dans le dashboard, sous **Security → Internal users**, vous pouvez également modifier:
-- `kibanaserver` - Utilisateur technique dashboard→indexer
-- `wazuh-wui` - Utilisateur API REST
-- `logstash` - Utilisateur Filebeat→Indexer (si utilisé)
+4. **Appliquer les changements:**
+   ```bash
+   # Redémarrer l'application via Runtipi
+   # Puis se connecter au conteneur indexer
+   docker exec -it wazuh-runtipi-wazuh-indexer-1 bash
 
-**Note:** Après modification des mots de passe, assurez-vous de mettre à jour les variables d'environnement correspondantes dans Runtipi et redémarrer les conteneurs pour synchroniser les configurations.
+   # Dans le conteneur, exécuter:
+   export INSTALLATION_DIR=/usr/share/wazuh-indexer
+   export JAVA_HOME=/usr/share/wazuh-indexer/jdk
+   bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh \
+     -cd /usr/share/wazuh-indexer/opensearch-security/ \
+     -cacert /usr/share/wazuh-indexer/config/certs/root-ca.pem \
+     -cert /usr/share/wazuh-indexer/config/certs/admin.pem \
+     -key /usr/share/wazuh-indexer/config/certs/admin-key.pem \
+     -p 9200 -nhnv -icl
+   ```
+
+5. **Mettre à jour les variables d'environnement Runtipi** avec les nouveaux mots de passe et redémarrer.
+
+**B. Changer le mot de passe de l'API Wazuh (wazuh-wui):**
+
+**Exigences:** 8-64 caractères avec majuscules, minuscules, chiffres ET symboles
+
+1. **Mettre à jour la variable d'environnement:**
+   - Dans Runtipi → Wazuh → Settings
+   - Modifier `API_PASSWORD` avec le nouveau mot de passe
+
+2. **Redémarrer l'application** pour appliquer les changements
+
+**Note importante:** La méthode officielle nécessite de regénérer les hash et d'exécuter `securityadmin.sh`. Pour une installation Runtipi, il est **fortement recommandé** de définir des mots de passe forts **avant** l'installation (Méthode 1) pour éviter cette procédure complexe.
 
 ---
 

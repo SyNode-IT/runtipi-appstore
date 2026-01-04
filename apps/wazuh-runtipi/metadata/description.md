@@ -205,9 +205,7 @@ Si vous utilisez les valeurs par défaut:
 
    **Exemple d'interaction:**
    ```
-   Running script with args: []
-   Enter password:
-   Re-Enter password:
+   [Password:]
    $2y$12$aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789abcdefghijklmnopqr
    ```
 
@@ -218,16 +216,6 @@ Si vous utilisez les valeurs par défaut:
    Le wildcard `*` fonctionne directement avec nano:
    ```bash
    nano /opt/runtipi/app-data/*/wazuh-runtipi/data/indexer-security/internal_users.yml
-   ```
-
-   **Note:** Si le wildcard `*` ne fonctionne pas, trouvez d'abord le chemin exact:
-   ```bash
-   # Afficher le chemin complet
-   ls -d /opt/runtipi/app-data/*/wazuh-runtipi
-   # Exemple de résultat: /opt/runtipi/app-data/abc123/wazuh-runtipi
-
-   # Puis utiliser ce chemin exact
-   nano /opt/runtipi/app-data/abc123/wazuh-runtipi/data/indexer-security/internal_users.yml
    ```
 
    **Pour changer le mot de passe admin:**
@@ -247,18 +235,18 @@ Si vous utilisez les valeurs par défaut:
    - Trouvez la section `kibanaserver:`
    - Remplacez le hash de la même manière
 
-   Sauvegardez: `Ctrl+O`, puis `Entrée`, puis `Ctrl+X`
+   Sauvegardez: `Ctrl+X`, puis `y`, puis `Entrée`
 
 5. **Redémarrer l'application via l'interface Runtipi:**
    - Allez dans Runtipi → Apps → Wazuh
-   - Cliquez sur "Stop"
+   - Cliquez sur "Arreter"
    - Attendez quelques secondes
-   - Cliquez sur "Start"
+   - Cliquez sur "Démarrer"
 
 6. **Appliquer les changements avec securityadmin.sh:**
    ```bash
    # Se connecter au conteneur wazuh-indexer
-   docker exec -it wazuh-runtipi-wazuh-indexer-1 bash
+   docker exec -it wazuh-runtipi_*-wazuh-indexer-1 bash
    ```
 
    **Une fois dans le conteneur:**
@@ -290,15 +278,37 @@ Si vous utilisez les valeurs par défaut:
    Quittez le conteneur: `exit`
 
 7. **Mettre à jour les variables d'environnement Runtipi:**
-   - Allez dans Runtipi → Apps → Wazuh → Settings
+   - Allez dans Runtipi → Apps → Wazuh → Paramètres
    - Modifiez `INDEXER_USERNAME` et `INDEXER_PASSWORD` avec vos nouveaux identifiants
    - Modifiez aussi `DASHBOARD_USERNAME` et `DASHBOARD_PASSWORD` si vous avez changé kibanaserver
-   - Cliquez sur "Save" puis redémarrez l'application
+   - Cliquez sur "Mettre à jour" puis "Redémarrer" l'application
 
-8. **Tester la connexion:**
-   - Ouvrez `https://VOTRE_IP:5601`
-   - Connectez-vous avec vos nouveaux identifiants
-   - Vérifiez que l'accès fonctionne correctement
+8. **Tester les nouveaux mots de passe:**
+
+   **Test admin (Dashboard):**
+   ```bash
+   # Via interface web
+   https://VOTRE_IP:5601
+   # Connectez-vous avec: admin / VOTRE_NOUVEAU_MOT_DE_PASSE
+   ```
+
+   **Test admin (API OpenSearch):**
+   ```bash
+   curl -k -u admin:VOTRE_NOUVEAU_MOT_DE_PASSE https://VOTRE_IP:9200/_cluster/health?pretty
+   ```
+   ✅ Succès si vous voyez: `"cluster_name" : "wazuh-cluster"`
+
+   **Test kibanaserver:**
+   ```bash
+   curl -k -u kibanaserver:VOTRE_NOUVEAU_MOT_DE_PASSE https://VOTRE_IP:9200
+   ```
+   ✅ Succès si vous voyez: `"cluster_name" : "wazuh-cluster"`
+
+   **⚠️ Test de sécurité (vérifier que les anciens mots de passe ne fonctionnent PLUS):**
+   ```bash
+   curl -k -u admin:admin https://VOTRE_IP:9200
+   ```
+   ✅ Succès si vous voyez: `"type":"security_exception","reason":"Unauthorized"`
 
 **B. Changer le mot de passe de l'API Wazuh (wazuh-wui):**
 
@@ -309,15 +319,15 @@ Si vous utilisez les valeurs par défaut:
    - Doit respecter les critères ci-dessus
 
 2. **Mettre à jour la variable d'environnement dans Runtipi:**
-   - Allez dans Runtipi → Apps → Wazuh → Settings
+   - Allez dans Runtipi → Apps → Wazuh → Paramètres
    - Trouvez `API_PASSWORD`
    - Remplacez `MyS3cr37P450r.*-` par votre nouveau mot de passe
-   - Cliquez sur "Save"
+   - Cliquez sur "Mettre à jour"
 
 3. **Redémarrer l'application:**
-   - Cliquez sur "Stop"
+   - Cliquez sur "Arreter"
    - Attendez quelques secondes
-   - Cliquez sur "Start"
+   - Cliquez sur "Démarrer"
 
 4. **Vérifier que le changement est effectif:**
    ```bash

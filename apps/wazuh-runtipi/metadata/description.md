@@ -285,28 +285,34 @@ Si vous utilisez les valeurs par défaut:
 
 8. **Tester les nouveaux mots de passe:**
 
-   **Test admin (Dashboard):**
+   **Test admin (Dashboard - interface web):**
    ```bash
-   # Via interface web
+   # Ouvrir dans le navigateur
    https://VOTRE_IP:5601
    # Connectez-vous avec: admin / VOTRE_NOUVEAU_MOT_DE_PASSE
    ```
+   ✅ Succès si vous pouvez vous connecter au dashboard
 
-   **Test admin (API OpenSearch):**
+   **Test admin (API OpenSearch - depuis le conteneur):**
    ```bash
-   curl -k -u admin:VOTRE_NOUVEAU_MOT_DE_PASSE https://VOTRE_IP:9200/_cluster/health?pretty
+   # Le port 9200 n'est PAS exposé à l'hôte (sécurité)
+   # Il faut tester depuis un conteneur Wazuh
+   docker exec -it wazuh-runtipi_*-wazuh-indexer-1 bash -c \
+     "curl -ks https://wazuh.indexer:9200/_cluster/health?pretty -u admin:VOTRE_NOUVEAU_MOT_DE_PASSE"
    ```
    ✅ Succès si vous voyez: `"cluster_name" : "wazuh-cluster"`
 
    **Test kibanaserver:**
    ```bash
-   curl -k -u kibanaserver:VOTRE_NOUVEAU_MOT_DE_PASSE https://VOTRE_IP:9200
+   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
+     "curl -ks https://wazuh.indexer:9200 -u kibanaserver:VOTRE_NOUVEAU_MOT_DE_PASSE"
    ```
    ✅ Succès si vous voyez: `"cluster_name" : "wazuh-cluster"`
 
    **⚠️ Test de sécurité (vérifier que les anciens mots de passe ne fonctionnent PLUS):**
    ```bash
-   curl -k -u admin:admin https://VOTRE_IP:9200
+   docker exec -it wazuh-runtipi_*-wazuh-indexer-1 bash -c \
+     "curl -ks https://wazuh.indexer:9200 -u admin:admin"
    ```
    ✅ Succès si vous voyez: `"type":"security_exception","reason":"Unauthorized"`
 

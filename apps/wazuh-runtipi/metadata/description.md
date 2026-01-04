@@ -241,7 +241,7 @@ Si vous utilisez les valeurs par défaut:
 
 2. **Redémarrer l'application** pour appliquer les changements
 
-**Note importante:** La méthode officielle nécessite de regénérer les hash et d'exécuter `securityadmin.sh`. Pour une installation Runtipi, il est **fortement recommandé** de définir des mots de passe forts **avant** l'installation (Méthode 1) pour éviter cette procédure complexe.
+**Note importante:** La modification des mots de passe après installation nécessite la procédure officielle décrite ci-dessus (regénération des hash et exécution de `securityadmin.sh`). Il est donc **fortement recommandé** de définir des mots de passe forts **dès l'installation initiale** dans le formulaire Runtipi.
 
 ---
 

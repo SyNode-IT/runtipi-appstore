@@ -355,14 +355,9 @@ Si vous utilisez les valeurs par défaut:
    - Allez dans Runtipi → Apps → Wazuh → Paramètres
    - Trouvez `API_PASSWORD`
    - Remplacez `MyS3cr37P450r.*-` par votre nouveau mot de passe
-   - Cliquez sur "Mettre à jour"
+   - Cliquez sur "Mettre à jour" puis "Redémarrer" l'application
 
-4. **Redémarrer l'application:**
-   - Cliquez sur "Arreter"
-   - Attendez quelques secondes
-   - Cliquez sur "Démarrer"
-
-5. **Vérifier que le changement est effectif:**
+4. **Vérifier que le changement est effectif:**
    ```bash
    # Tester l'API avec le nouveau mot de passe
    curl -k -u wazuh-wui:VOTRE_NOUVEAU_MOT_DE_PASSE https://VOTRE_IP:55000/security/user/authenticate

@@ -372,9 +372,9 @@ if [ -n "$MANAGER_CONTAINER" ]; then
 
     echo -ne "  Main config is symlink: "
     if docker exec "$MANAGER_CONTAINER" test -L "$OSSEC_CONF" 2>/dev/null; then
-        echo -e "${GREEN}✓ YES (Bug #3 fixed)${NC}"
+        echo -e "${GREEN}✓ YES (persistent via symlink)${NC}"
     else
-        echo -e "${YELLOW}⚠ NO (Bug #3 - config not persistent)${NC}"
+        echo -e "${YELLOW}⚠ NO (config not persistent - will be lost on restart)${NC}"
     fi
 else
     echo -e "${RED}✗ Manager container not running${NC}"
@@ -449,11 +449,11 @@ if [ -n "$MANAGER_CONTAINER" ]; then
             echo -e "  ${GREEN}  The 4 environment variables above control SSL configuration${NC}"
         fi
 
-        echo -ne "  Seccomp fix for pthread: "
+        echo -ne "  Seccomp configuration: "
         if docker exec "$MANAGER_CONTAINER" grep -q "seccomp:" "$FILEBEAT_CONF" 2>/dev/null; then
-            echo -e "${GREEN}✓ YES (pthread_create fix present)${NC}"
+            echo -e "${GREEN}✓ Configured (prevents pthread_create errors)${NC}"
         else
-            echo -e "${YELLOW}⚠ NO (may cause pthread_create errors)${NC}"
+            echo -e "${YELLOW}⚠ Not configured (may cause pthread_create errors)${NC}"
         fi
     else
         echo -e "${RED}✗ NO${NC}"

@@ -268,6 +268,20 @@ bash /opt/runtipi/app-data/*/wazuh-runtipi/data/debug/wazuh-health-check.sh
 - ✅ Variables d'environnement SSL Filebeat (méthode officielle)
 - ✅ Initialisation de la sécurité OpenSearch
 
+### Vérification via l'Interface Web
+
+Après l'installation, vous pouvez également vérifier la santé de votre déploiement directement dans l'interface Wazuh:
+
+**URL de vérification:** `https://VOTRE_IP:5601/app/logs#/health-check`
+
+Cette page affiche:
+- État des services Wazuh (indexer, manager, dashboard)
+- Statistiques de performance en temps réel
+- Alertes de santé du cluster
+- Métriques de connectivité des agents
+
+**Note:** Remplacez `VOTRE_IP` par l'adresse IP de votre serveur Runtipi. Si vous utilisez un proxy inverse avec un nom de domaine, utilisez celui-ci à la place.
+
 ---
 
 ## 📱 Déployer des Agents Wazuh

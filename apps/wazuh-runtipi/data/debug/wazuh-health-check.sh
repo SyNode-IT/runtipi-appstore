@@ -160,7 +160,12 @@ echo ""
 
 # Display logs for all Wazuh containers
 for service in certs indexer indexer-init manager dashboard; do
-    container_name=$(docker ps -a --format '{{.Names}}' | grep -E "${WAZUH_PREFIX}.*${service}" | head -1)
+    # Special handling for 'indexer' to avoid matching 'indexer-init'
+    if [ "$service" = "indexer" ]; then
+        container_name=$(docker ps -a --format '{{.Names}}' | grep -E "${WAZUH_PREFIX}.*${service}" | grep -v "init" | head -1)
+    else
+        container_name=$(docker ps -a --format '{{.Names}}' | grep -E "${WAZUH_PREFIX}.*${service}" | head -1)
+    fi
     if [ -n "$container_name" ]; then
         status=$(docker inspect --format='{{.State.Status}}' "$container_name" 2>/dev/null)
         health=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "no healthcheck")

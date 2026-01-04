@@ -327,42 +327,43 @@ Si vous utilisez les valeurs par défaut:
    - Doit respecter les critères ci-dessus
 
 2. **Mettre à jour le fichier wazuh.yml dans le conteneur dashboard:**
+
+   **Méthode recommandée - Utiliser sed (une seule commande):**
+   ```bash
+   # Remplacer l'ancien mot de passe par le nouveau dans wazuh.yml
+   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
+     "sed -i 's|password: \"MyS3cr37P450r\.\*-\"|password: \"VOTRE_NOUVEAU_MOT_DE_PASSE\"|g' \
+     /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml"
+   ```
+
+   **⚠️ IMPORTANT:** Remplacez `VOTRE_NOUVEAU_MOT_DE_PASSE` par votre mot de passe réel
+
+   **Vérifier que le changement a été effectué:**
+   ```bash
+   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
+     "grep 'password:' /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml"
+   ```
+
+   Vous devriez voir votre nouveau mot de passe dans la sortie.
+
+   **Alternative - Méthode manuelle (si sed ne fonctionne pas):**
    ```bash
    # Se connecter au conteneur dashboard
    docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash
+
+   # Afficher le fichier pour voir son contenu
+   cat /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+
+   # Utiliser sed directement dans le conteneur
+   sed -i 's|password: "MyS3cr37P450r\.\*-"|password: "VOTRE_NOUVEAU_MOT_DE_PASSE"|g' \
+     /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+
+   # Vérifier le changement
+   grep 'password:' /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+
+   # Quitter le conteneur
+   exit
    ```
-
-   **Une fois dans le conteneur:**
-   ```bash
-   # Éditer le fichier de configuration
-   vi /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
-   ```
-
-   **Trouvez la section qui ressemble à:**
-   ```yaml
-   hosts:
-     - default:
-         url: https://wazuh.manager
-         port: 55000
-         username: wazuh-wui
-         password: "MyS3cr37P450r.*-"
-         run_as: false
-   ```
-
-   **Modifiez uniquement le champ `password`:**
-   ```yaml
-   hosts:
-     - default:
-         url: https://wazuh.manager
-         port: 55000
-         username: wazuh-wui
-         password: "VOTRE_NOUVEAU_MOT_DE_PASSE"
-         run_as: false
-   ```
-
-   Sauvegardez: Appuyez sur `Esc`, puis tapez `:wq` et `Entrée`
-
-   Quittez le conteneur: `exit`
 
 3. **Mettre à jour la variable d'environnement dans Runtipi:**
    - Allez dans Runtipi → Apps → Wazuh → Paramètres

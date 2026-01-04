@@ -328,42 +328,28 @@ Si vous utilisez les valeurs par défaut:
 
 2. **Mettre à jour le fichier wazuh.yml dans le conteneur dashboard:**
 
-   **Méthode recommandée - Utiliser sed (une seule commande):**
-   ```bash
-   # Remplacer l'ancien mot de passe par le nouveau dans wazuh.yml
-   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
-     "sed -i 's|password: MyS3cr37P450r\.\*-|password: VOTRE_NOUVEAU_MOT_DE_PASSE|g' \
-     /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml"
-   ```
-
-   **⚠️ IMPORTANT:** Remplacez `VOTRE_NOUVEAU_MOT_DE_PASSE` par votre mot de passe réel (sans guillemets)
-
-   **Vérifier que le changement a été effectué:**
-   ```bash
-   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
-     "grep 'password:' /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml"
-   ```
-
-   Vous devriez voir votre nouveau mot de passe dans la sortie.
-
-   **Alternative - Méthode manuelle (si sed ne fonctionne pas):**
    ```bash
    # Se connecter au conteneur dashboard
    docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash
+   ```
 
-   # Afficher le fichier pour voir son contenu
+   **Une fois dans le conteneur:**
+   ```bash
+   # Afficher le fichier pour voir son contenu actuel
    cat /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 
-   # Utiliser sed directement dans le conteneur (sans guillemets)
+   # Remplacer l'ancien mot de passe par le nouveau
    sed -i 's|password: MyS3cr37P450r\.\*-|password: VOTRE_NOUVEAU_MOT_DE_PASSE|g' \
      /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 
-   # Vérifier le changement
+   # Vérifier que le changement a été effectué
    grep 'password:' /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 
    # Quitter le conteneur
    exit
    ```
+
+   **⚠️ IMPORTANT:** Remplacez `VOTRE_NOUVEAU_MOT_DE_PASSE` par votre mot de passe réel (sans guillemets)
 
 3. **Mettre à jour la variable d'environnement dans Runtipi:**
    - Allez dans Runtipi → Apps → Wazuh → Paramètres

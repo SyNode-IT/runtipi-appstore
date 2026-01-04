@@ -56,15 +56,18 @@ print_section() {
 # Function to check service
 check_service() {
     local service=$1
-    local container_name=$(docker ps -a --format '{{.Names}}' | grep -E "${WAZUH_PREFIX}.*${service}" | head -1)
+    local container_name
+    container_name=$(docker ps -a --format '{{.Names}}' | grep -E "${WAZUH_PREFIX}.*${service}" | head -1)
 
     if [ -z "$container_name" ]; then
         echo -e "${RED}✗ Container not found${NC}"
         return 1
     fi
 
-    local status=$(docker inspect --format='{{.State.Status}}' "$container_name" 2>/dev/null)
-    local health=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "no healthcheck")
+    local status
+    local health
+    status=$(docker inspect --format='{{.State.Status}}' "$container_name" 2>/dev/null)
+    health=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "no healthcheck")
 
     echo -ne "  $service: "
 
@@ -80,7 +83,8 @@ check_service() {
             return 1
         fi
     elif [ "$status" = "exited" ]; then
-        local exit_code=$(docker inspect --format='{{.State.ExitCode}}' "$container_name" 2>/dev/null)
+        local exit_code
+        exit_code=$(docker inspect --format='{{.State.ExitCode}}' "$container_name" 2>/dev/null)
         if [ "$exit_code" = "0" ]; then
             echo -e "${GREEN}✓ Exited successfully (code 0)${NC}"
             return 0

@@ -182,29 +182,17 @@ Si vous utilisez les valeurs par défaut:
 | API           | `wazuh-wui`    | `MyS3cr37P450r.*-`   | API REST du manager            |
 | Kibanaserver  | `kibanaserver` | `kibanaserver`       | Connexion dashboard→indexer    |
 
-**⚠️ IMPORTANT:** Pour une utilisation en production, modifiez ces mots de passe **avant** l'installation via l'interface Runtipi!
+**⚠️ AVERTISSEMENT:** Ces mots de passe par défaut sont publics. Vous **DEVEZ** les changer immédiatement après l'installation en suivant la procédure officielle ci-dessous.
 
-### Étape 4: Changer les Mots de Passe (Recommandé pour Production)
+### Étape 4: Changer les Mots de Passe (OBLIGATOIRE pour Production)
+
+⚠️ **AVERTISSEMENT DE SÉCURITÉ:** Les mots de passe par défaut sont publics et constituent une vulnérabilité critique. Vous **DEVEZ** les changer après l'installation.
 
 ⚠️ **Source officielle:** [Wazuh Documentation - Changing Default Passwords](https://documentation.wazuh.com/current/deployment-options/docker/changing-default-password.html)
 
-#### Méthode 1: Avant l'Installation (Recommandé)
+**Note importante pour Runtipi:** La configuration des mots de passe via les variables d'environnement Runtipi AVANT installation ne suffit PAS. Vous devez impérativement suivre la procédure officielle ci-dessous APRÈS l'installation pour sécuriser votre déploiement.
 
-La manière la plus sûre est de définir des mots de passe forts **avant** l'installation via l'interface Runtipi:
-
-1. Dans Runtipi, avant de cliquer sur "Install"
-2. Configurer les variables d'environnement:
-   - `INDEXER_PASSWORD` - Mot de passe admin de l'indexer (au lieu de "admin")
-   - `DASHBOARD_PASSWORD` - Mot de passe dashboard→indexer (au lieu de "kibanaserver")
-   - `API_PASSWORD` - Mot de passe API REST (au lieu de "MyS3cr37P450r.*-")
-3. Utiliser des mots de passe forts:
-   - **Indexer/Dashboard:** Minimum 8 caractères
-   - **API:** 8-64 caractères avec majuscules, minuscules, chiffres ET symboles
-4. Procéder à l'installation
-
-#### Méthode 2: Après l'Installation (Méthode Officielle Wazuh)
-
-Si vous avez déjà installé Wazuh avec les mots de passe par défaut, suivez la procédure officielle :
+#### Procédure Officielle de Changement des Mots de Passe
 
 **A. Changer le mot de passe des utilisateurs Indexer (admin/kibanaserver):**
 

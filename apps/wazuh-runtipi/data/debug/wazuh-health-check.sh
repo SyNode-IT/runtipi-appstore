@@ -143,7 +143,11 @@ else
 fi
 
 echo ""
-echo -e "Summary: ${GREEN}$SERVICES_OK OK${NC} | ${RED}$SERVICES_FAILED FAILED${NC}"
+if [ "$SERVICES_FAILED" -eq 0 ]; then
+    echo -e "Summary: ${GREEN}$SERVICES_OK OK${NC} | ${GREEN}$SERVICES_FAILED FAILED${NC}"
+else
+    echo -e "Summary: ${GREEN}$SERVICES_OK OK${NC} | ${RED}$SERVICES_FAILED FAILED${NC}"
+fi
 echo ""
 
 # 1b. Container Logs for All Services
@@ -181,10 +185,11 @@ if [ -d "$DATA_DIR" ] && [ -n "$DATA_DIR" ]; then
     # Get parent directory (remove /data from end)
     APP_DIR=$(dirname "$DATA_DIR")
     SIZE_HUMAN=$(du -sh "$APP_DIR" 2>/dev/null | awk '{print $1}')
-    SIZE_GB=$(du -sb "$APP_DIR" 2>/dev/null | awk '{print int($1/1024/1024/1024)}')
+    # Round to nearest GB instead of truncating
+    SIZE_GB=$(du -sb "$APP_DIR" 2>/dev/null | awk '{printf "%.0f", $1/1024/1024/1024}')
 
     echo -e "  App directory: $APP_DIR"
-    echo -ne "  Size: $SIZE_HUMAN ($SIZE_GB GB) - "
+    echo -ne "  Size: $SIZE_HUMAN (≈${SIZE_GB} GB) - "
 
     if [ "$SIZE_GB" -gt 40 ]; then
         echo -e "${RED}⚠ WARNING: Excessive size! Expected 7 GB${NC}"
@@ -440,8 +445,8 @@ if [ -n "$MANAGER_CONTAINER" ]; then
         else
             # Not an error - SSL is configured via environment variables (official method)
             # The official cont-init.d/1-config-filebeat generates the config automatically
-            echo -e "${YELLOW}ℹ INFO (configured via environment variables - official method)${NC}"
-            echo -e "  ${YELLOW}  The 4 environment variables above control SSL configuration${NC}"
+            echo -e "${GREEN}✓ YES (configured via environment variables - official method)${NC}"
+            echo -e "  ${GREEN}  The 4 environment variables above control SSL configuration${NC}"
         fi
 
         echo -ne "  Seccomp fix for pthread: "

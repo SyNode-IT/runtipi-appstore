@@ -307,7 +307,7 @@ Si vous utilisez les valeurs par défaut:
    docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
      "curl -ks https://wazuh.indexer:9200 -u kibanaserver:VOTRE_NOUVEAU_MOT_DE_PASSE"
    ```
-   ✅ Succès si vous voyez: `"cluster_name" : "wazuh-cluster"`
+   ✅ Succès si vous voyez: `"name" : "wazuh.indexer"`
 
    **⚠️ Test de sécurité (vérifier que les anciens mots de passe ne fonctionnent PLUS):**
    ```bash
@@ -318,24 +318,64 @@ Si vous utilisez les valeurs par défaut:
 
 **B. Changer le mot de passe de l'API Wazuh (wazuh-wui):**
 
+**⚠️ Source officielle:** [Wazuh Documentation - Changing API Password](https://documentation.wazuh.com/current/deployment-options/docker/changing-default-password.html)
+
 **⚠️ Exigences du mot de passe:** 8-64 caractères avec majuscules, minuscules, chiffres ET symboles
 
 1. **Choisir un nouveau mot de passe fort:**
    - Exemple: `MyN3wP@ssw0rd!2024`
    - Doit respecter les critères ci-dessus
 
-2. **Mettre à jour la variable d'environnement dans Runtipi:**
+2. **Mettre à jour le fichier wazuh.yml dans le conteneur dashboard:**
+   ```bash
+   # Se connecter au conteneur dashboard
+   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash
+   ```
+
+   **Une fois dans le conteneur:**
+   ```bash
+   # Éditer le fichier de configuration
+   vi /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+   ```
+
+   **Trouvez la section qui ressemble à:**
+   ```yaml
+   hosts:
+     - default:
+         url: https://wazuh.manager
+         port: 55000
+         username: wazuh-wui
+         password: "MyS3cr37P450r.*-"
+         run_as: false
+   ```
+
+   **Modifiez uniquement le champ `password`:**
+   ```yaml
+   hosts:
+     - default:
+         url: https://wazuh.manager
+         port: 55000
+         username: wazuh-wui
+         password: "VOTRE_NOUVEAU_MOT_DE_PASSE"
+         run_as: false
+   ```
+
+   Sauvegardez: Appuyez sur `Esc`, puis tapez `:wq` et `Entrée`
+
+   Quittez le conteneur: `exit`
+
+3. **Mettre à jour la variable d'environnement dans Runtipi:**
    - Allez dans Runtipi → Apps → Wazuh → Paramètres
    - Trouvez `API_PASSWORD`
    - Remplacez `MyS3cr37P450r.*-` par votre nouveau mot de passe
    - Cliquez sur "Mettre à jour"
 
-3. **Redémarrer l'application:**
+4. **Redémarrer l'application:**
    - Cliquez sur "Arreter"
    - Attendez quelques secondes
    - Cliquez sur "Démarrer"
 
-4. **Vérifier que le changement est effectif:**
+5. **Vérifier que le changement est effectif:**
    ```bash
    # Tester l'API avec le nouveau mot de passe
    curl -k -u wazuh-wui:VOTRE_NOUVEAU_MOT_DE_PASSE https://VOTRE_IP:55000/security/user/authenticate
@@ -350,7 +390,9 @@ Si vous utilisez les valeurs par défaut:
    }
    ```
 
-   Si vous obtenez un token, le changement est réussi!
+   ✅ Si vous obtenez un token, le changement est réussi!
+
+**⚠️ NOTE IMPORTANTE:** Le fichier `wazuh.yml` est stocké dans `/usr/share/wazuh-dashboard/data/` qui n'est PAS un volume persistant. Cela signifie que si vous **supprimez complètement l'application** (pas juste un redémarrage), vous devrez refaire cette modification. Pour un simple redémarrage ou mise à jour, le fichier est préservé.
 
 ---
 

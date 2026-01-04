@@ -241,7 +241,7 @@ Si vous utilisez les valeurs par défaut:
 
 2. **Redémarrer l'application** pour appliquer les changements
 
-**Note importante:** La modification des mots de passe après installation nécessite la procédure officielle décrite ci-dessus (regénération des hash et exécution de `securityadmin.sh`). Il est donc **fortement recommandé** de définir des mots de passe forts **dès l'installation initiale** dans le formulaire Runtipi.
+**⚠️ IMPORTANT:** Il n'existe **aucun moyen** de contourner cette procédure. Même si vous définissez des mots de passe personnalisés dans le formulaire Runtipi avant l'installation, vous devrez **obligatoirement** exécuter la procédure `hash.sh` + `securityadmin.sh` décrite ci-dessus pour que les changements soient effectifs dans OpenSearch. C'est la **seule méthode officielle** supportée par Wazuh.
 
 ---
 

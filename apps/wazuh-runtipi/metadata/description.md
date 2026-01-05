@@ -246,7 +246,7 @@ Si vous utilisez les valeurs par défaut:
 6. **Appliquer les changements avec securityadmin.sh:**
    ```bash
    # Se connecter au conteneur wazuh-indexer
-   docker exec -it wazuh-runtipi_*-wazuh-indexer-1 bash
+   docker exec -it $(docker ps --filter "name=wazuh-indexer" --format "{{.Names}}" | grep -v init) bash
    ```
 
    **Une fois dans le conteneur:**
@@ -297,21 +297,21 @@ Si vous utilisez les valeurs par défaut:
    ```bash
    # Le port 9200 n'est PAS exposé à l'hôte (sécurité)
    # Il faut tester depuis un conteneur Wazuh
-   docker exec -it wazuh-runtipi_*-wazuh-indexer-1 bash -c \
+   docker exec -it $(docker ps --filter "name=wazuh-indexer" --format "{{.Names}}" | grep -v init) bash -c \
      "curl -ks https://wazuh.indexer:9200/_cluster/health?pretty -u admin:VOTRE_NOUVEAU_MOT_DE_PASSE"
    ```
    ✅ Succès si vous voyez: `"cluster_name" : "wazuh-cluster"`
 
    **Test kibanaserver:**
    ```bash
-   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash -c \
+   docker exec -it $(docker ps --filter "name=wazuh-dashboard" --format "{{.Names}}") bash -c \
      "curl -ks https://wazuh.indexer:9200 -u kibanaserver:VOTRE_NOUVEAU_MOT_DE_PASSE"
    ```
    ✅ Succès si vous voyez: `"name" : "wazuh.indexer"`
 
    **⚠️ Test de sécurité (vérifier que les anciens mots de passe ne fonctionnent PLUS):**
    ```bash
-   docker exec -it wazuh-runtipi_*-wazuh-indexer-1 bash -c \
+   docker exec -it $(docker ps --filter "name=wazuh-indexer" --format "{{.Names}}" | grep -v init) bash -c \
      "curl -ks https://wazuh.indexer:9200 -u admin:admin"
    ```
    ✅ Succès si vous voyez: `"type":"security_exception","reason":"Unauthorized"`
@@ -330,7 +330,7 @@ Si vous utilisez les valeurs par défaut:
 
    ```bash
    # Se connecter au conteneur dashboard
-   docker exec -it wazuh-runtipi_*-wazuh-dashboard-1 bash
+   docker exec -it $(docker ps --filter "name=wazuh-dashboard" --format "{{.Names}}") bash
    ```
 
    **Une fois dans le conteneur:**

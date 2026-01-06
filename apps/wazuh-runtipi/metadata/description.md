@@ -237,13 +237,7 @@ Si vous utilisez les valeurs par défaut:
 
    Sauvegardez: `Ctrl+X`, puis `y`, puis `Entrée`
 
-5. **Redémarrer l'application via l'interface Runtipi:**
-   - Allez dans Runtipi → Apps → Wazuh
-   - Cliquez sur "Arreter"
-   - Attendez quelques secondes
-   - Cliquez sur "Démarrer"
-
-6. **Appliquer les changements avec securityadmin.sh:**
+5. **Appliquer les changements avec securityadmin.sh:**
    ```bash
    # Se connecter au conteneur wazuh-indexer
    docker exec -it $(docker ps --filter "name=wazuh-indexer" --format "{{.Names}}" | grep -v init) bash
@@ -277,13 +271,13 @@ Si vous utilisez les valeurs par défaut:
 
    Quittez le conteneur: `exit`
 
-7. **Mettre à jour les variables d'environnement Runtipi:**
+6. **Mettre à jour les variables d'environnement Runtipi:**
    - Allez dans Runtipi → Apps → Wazuh → Paramètres
    - Modifiez `INDEXER_USERNAME` et `INDEXER_PASSWORD` avec vos nouveaux identifiants
    - Modifiez aussi `DASHBOARD_USERNAME` et `DASHBOARD_PASSWORD` si vous avez changé kibanaserver
    - Cliquez sur "Mettre à jour" puis "Redémarrer" l'application
 
-8. **Tester les nouveaux mots de passe:**
+7. **Tester les nouveaux mots de passe:**
 
    **Test admin (Dashboard - interface web):**
    ```bash

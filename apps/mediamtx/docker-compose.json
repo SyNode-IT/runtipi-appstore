@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "services": [
+    {
+      "name": "mediamtx",
+      "image": "bluenviron/mediamtx:1.15.6",
+      "hostname": "mediamtx",
+      "isMain": true,
+      "internalPort": "8889",
+      "environment": [
+        {
+          "key": "MTX_PROTOCOLS",
+          "value": "tcp"
+        },
+        {
+          "key": "MTX_LOGLEVEL",
+          "value": "info"
+        },
+        {
+          "key": "MTX_LOGDESTINATIONS",
+          "value": "stdout"
+        },
+        {
+          "key": "MTX_RTSPADDRESS",
+          "value": ":8554"
+        },
+        {
+          "key": "MTX_RTMPADDRESS",
+          "value": ":1935"
+        },
+        {
+          "key": "MTX_HLSADDRESS",
+          "value": ":8888"
+        },
+        {
+          "key": "MTX_WEBRTCADDRESS",
+          "value": ":8889"
+        },
+        {
+          "key": "MTX_SRTADDRESS",
+          "value": ":8890"
+        },
+        {
+          "key": "MTX_APIADDRESS",
+          "value": ":9997"
+        },
+        {
+          "key": "MTX_METRICSADDRESS",
+          "value": ":9998"
+        },
+        {
+          "key": "MTX_AUTHINTERNALUSERS",
+          "value": "${MTX_API_USERNAME:+${MTX_API_USERNAME}:${MTX_API_PASSWORD}}"
+        },
+        {
+          "key": "MTX_PATHDEFAULTS_RECORD",
+          "value": "${MTX_RECORD_ENABLED:-false}"
+        },
+        {
+          "key": "MTX_PATHDEFAULTS_RECORDPATH",
+          "value": "./recordings/%path/%Y-%m-%d_%H-%M-%S-%f"
+        },
+        {
+          "key": "MTX_PATHDEFAULTS_RECORDFORMAT",
+          "value": "fmp4"
+        }
+      ],
+      "addPorts": [
+        {
+          "containerPort": 8554,
+          "hostPort": 8554,
+          "tcp": true
+        },
+        {
+          "containerPort": 8554,
+          "hostPort": 8554,
+          "udp": true
+        },
+        {
+          "containerPort": 1935,
+          "hostPort": 1935,
+          "tcp": true
+        },
+        {
+          "containerPort": 8888,
+          "hostPort": 8888,
+          "tcp": true
+        },
+        {
+          "containerPort": 8890,
+          "hostPort": 8890,
+          "udp": true
+        },
+        {
+          "containerPort": 8189,
+          "hostPort": 8189,
+          "udp": true
+        },
+        {
+          "containerPort": 9997,
+          "hostPort": 9997,
+          "tcp": true
+        },
+        {
+          "containerPort": 9998,
+          "hostPort": 9998,
+          "tcp": true
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/recordings",
+          "containerPath": "/mediamtx/recordings"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/config",
+          "containerPath": "/mediamtx/config"
+        }
+      ],
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "2.0",
+            "memory": "2G"
+          },
+          "reservations": {
+            "cpus": "1.0",
+            "memory": "512M",
+            "devices": []
+          }
+        }
+      },
+      "healthCheck": {
+        "test": "wget --no-verbose --tries=1 --spider http://localhost:9997/v3/config/get || exit 1",
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 3,
+        "startPeriod": "10s"
+      }
+    }
+  ]
+}

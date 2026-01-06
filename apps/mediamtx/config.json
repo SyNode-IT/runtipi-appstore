@@ -1,0 +1,45 @@
+{
+  "name": "MediaMTX",
+  "id": "mediamtx",
+  "available": true,
+  "exposable": true,
+  "dynamic_config": true,
+  "port": 8889,
+  "tipi_version": 2,
+  "version": "1.15.6",
+  "categories": ["media", "utilities"],
+  "short_desc": "Serveur de streaming multimédia moderne supportant RTSP, RTMP, HLS, WebRTC, SRT.",
+  "description": "MediaMTX est un serveur de streaming multimédia prêt à l'emploi et performant qui supporte RTSP, RTMP, HLS, WebRTC, SRT et plus encore. Zero configuration nécessaire pour démarrer.",
+  "author": "bluenviron",
+  "source": "https://github.com/bluenviron/mediamtx",
+  "website": "https://mediamtx.org",
+  "form_fields": [
+    {
+      "type": "text",
+      "env_variable": "MTX_API_USERNAME",
+      "label": "API Username (optionnel)",
+      "default": "",
+      "required": false,
+      "hint": "Nom d'utilisateur pour l'API REST (laisser vide pour désactiver l'authentification)"
+    },
+    {
+      "type": "password",
+      "env_variable": "MTX_API_PASSWORD",
+      "label": "API Password (optionnel)",
+      "default": "",
+      "required": false,
+      "hint": "Mot de passe pour l'API REST"
+    },
+    {
+      "type": "boolean",
+      "env_variable": "MTX_RECORD_ENABLED",
+      "label": "Activer l'enregistrement des streams",
+      "default": false,
+      "required": false
+    }
+  ],
+  "supported_architectures": [
+    "amd64",
+    "arm64"
+  ]
+}

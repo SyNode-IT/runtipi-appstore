@@ -4,6 +4,51 @@ set -e
 echo "MANAGER_INIT: Starting manager initialization..."
 
 # ============================================================================
+# AGENT GROUPS (SHARED) INITIALIZATION
+# ============================================================================
+# When /var/ossec/etc/shared is mounted as an empty volume, the default files
+# are missing. We need to create them for group management to work.
+
+SHARED_DIR="/var/ossec/etc/shared"
+TEMPLATE_FILE="$SHARED_DIR/agent-template.conf"
+DEFAULT_DIR="$SHARED_DIR/default"
+DEFAULT_AGENT_CONF="$DEFAULT_DIR/agent.conf"
+
+echo "MANAGER_INIT: Checking agent groups shared directory..."
+
+# Create default group directory if it doesn't exist
+if [ ! -d "$DEFAULT_DIR" ]; then
+    echo "MANAGER_INIT: Creating default group directory..."
+    mkdir -p "$DEFAULT_DIR"
+fi
+
+# Create agent-template.conf if it doesn't exist (required for creating new groups)
+if [ ! -f "$TEMPLATE_FILE" ]; then
+    echo "MANAGER_INIT: Creating agent-template.conf..."
+    cat > "$TEMPLATE_FILE" << 'TEMPLATE_EOF'
+<!-- Agent configuration template -->
+<!-- This file is used as a template when creating new groups -->
+<agent_config>
+</agent_config>
+TEMPLATE_EOF
+fi
+
+# Create default/agent.conf if it doesn't exist
+if [ ! -f "$DEFAULT_AGENT_CONF" ]; then
+    echo "MANAGER_INIT: Creating default/agent.conf..."
+    cat > "$DEFAULT_AGENT_CONF" << 'AGENT_EOF'
+<!-- Default agent configuration -->
+<agent_config>
+</agent_config>
+AGENT_EOF
+fi
+
+# Set correct ownership (ossec:ossec = 1000:1000 in container)
+chown -R wazuh:wazuh "$SHARED_DIR" 2>/dev/null || chown -R 1000:1000 "$SHARED_DIR" 2>/dev/null || true
+
+echo "MANAGER_INIT: Agent groups directory ready"
+
+# ============================================================================
 # OSSEC.CONF CONFIGURATION
 # ============================================================================
 # The official Wazuh /init script creates ossec.conf during initialization.

@@ -41,6 +41,10 @@
           "containerPath": "/manager-queue"
         },
         {
+          "hostPath": "${APP_DATA_DIR}/data/manager-shared",
+          "containerPath": "/manager-shared"
+        },
+        {
           "hostPath": "${APP_DATA_DIR}/data/dashboard-config",
           "containerPath": "/dashboard-config"
         },
@@ -328,6 +332,10 @@
         {
           "hostPath": "${APP_DATA_DIR}/data/config/wazuh_ssl_certs",
           "containerPath": "/var/ossec/etc/certs"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/manager-shared",
+          "containerPath": "/var/ossec/etc/shared"
         },
         {
           "hostPath": "${APP_DATA_DIR}/data/scripts",

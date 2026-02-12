@@ -20,10 +20,6 @@
           "containerPath": "/var/www"
         },
         {
-          "hostPath": "${APP_DATA_DIR}/data/html",
-          "containerPath": "/usr/share/nginx/html"
-        },
-        {
           "hostPath": "${APP_DATA_DIR}/data/logs",
           "containerPath": "/var/log/nginx"
         },

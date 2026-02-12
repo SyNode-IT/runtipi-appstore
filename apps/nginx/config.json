@@ -11,6 +11,7 @@
   "tipi_version": 2,
   "categories": ["utilities", "network"],
   "description": "Nginx est un serveur web haute performance avec des volumes montés pour la configuration et le contenu des sites.",
+  "source": "https://hub.docker.com/_/nginx",
   "website": "https://nginx.org",
   "supported_architectures": ["amd64", "arm64"],
   "form_fields": [

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "$schema": "https://schemas.runtipi.io/dynamic-compose.json",
+  "services": [
+    {
+      "name": "nginx-custom",
+      "image": "nginx:latest",
+      "isMain": true,
+      "internalPort": 80,
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/conf.d",
+          "containerPath": "/etc/nginx/conf.d",
+          "readOnly": false
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/nginx.conf",
+          "containerPath": "/etc/nginx/nginx.conf",
+          "readOnly": false
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/www",
+          "containerPath": "/var/www",
+          "readOnly": false
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/html",
+          "containerPath": "/usr/share/nginx/html",
+          "readOnly": false
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/logs",
+          "containerPath": "/var/log/nginx",
+          "readOnly": false
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/ssl",
+          "containerPath": "/etc/nginx/ssl",
+          "readOnly": true
+        }
+      ],
+      "environment": [
+        {
+          "key": "NGINX_HOST",
+          "value": "${NGINX_SERVER_NAME:-localhost}"
+        },
+        {
+          "key": "TZ",
+          "value": "${TZ:-Europe/Paris}"
+        }
+      ],
+      "healthCheck": {
+        "test": "curl --fail http://localhost:80 || exit 1",
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 3
+      }
+    }
+  ]
+}

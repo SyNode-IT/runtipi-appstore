@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.runtipi.io/config.json",
+  "name": "Nginx Custom",
+  "id": "nginx-custom",
+  "available": true,
+  "short_desc": "Serveur web Nginx avec configuration personnalisable",
+  "author": "Nginx Inc.",
+  "port": 8080,
+  "exposable": true,
+  "dynamic_config": true,
+  "min_tipi_version": "4.5.0",
+  "version": "1.0.0",
+  "tipiVersion": 1,
+  "categories": ["utilities", "network"],
+  "description": "Nginx est un serveur web haute performance avec des volumes montés pour la configuration et le contenu des sites.",
+  "website": "https://nginx.org",
+  "supported_architectures": ["amd64", "arm64"],
+  "form_fields": [
+    {
+      "type": "text",
+      "label": "Nom du serveur (server_name)",
+      "hint": "Ex: monsite.local ou localhost",
+      "required": false,
+      "env_variable": "NGINX_SERVER_NAME",
+      "default": "localhost"
+    }
+  ]
+}

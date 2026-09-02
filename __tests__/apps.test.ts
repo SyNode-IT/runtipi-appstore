@@ -74,6 +74,8 @@ describe("modern compose files preserve runtime semantics", () => {
     expect(parsed['x-runtipi']?.schema_version).toBe(2)
     expect(parsed.services?.['sandbox-certs']?.restart).toBe('no')
     expect(parsed.services?.['sandbox-api']?.['x-runtipi']?.is_main).toBe(true)
+    expect(parsed.services?.['sandbox-runner-1']?.environment?.SANDBOX_RUNNER_HTTP_BASE_URL).toBe('https://sandbox-runner-1:8080')
+    expect(parsed.services?.['sandbox-runner-1']?.healthcheck?.test).toContain('https://localhost:8080/readyz')
   })
 })
 

@@ -10,7 +10,7 @@ Sandbox auto-hébergé pour l'**AI Assistant** de n8n (setup « Self-host the sa
 
 ## Après l'installation
 
-Dans l'app **n8n** (paramètres ou `app.env`), ajouter :
+Lors de l'installation, choisir une clé forte dans le champ **Clé API partagée avec n8n**. Dans l'app officielle **n8n** (paramètres ou `app.env`), ajouter le bloc suivant en recopiant cette même clé :
 
 ```
 N8N_ENABLED_MODULES=instance-ai
@@ -18,7 +18,8 @@ N8N_INSTANCE_AI_SANDBOX_ENABLED=true
 N8N_INSTANCE_AI_SANDBOX_PROVIDER=n8n-sandbox
 N8N_INSTANCE_AI_SANDBOX_IMAGE=n8nio/n8n-sandbox-service-sandbox:1.3.0
 N8N_SANDBOX_SERVICE_URL=http://sandbox-api:8080
-N8N_SANDBOX_SERVICE_API_KEY=<valeur du champ « Clé API sandbox »>
+N8N_SANDBOX_SERVICE_API_KEY=<même valeur que « Clé API partagée avec n8n »>
+N8N_PROXY_HOPS=1
 ```
 
 Puis redémarrer n8n et vérifier depuis son conteneur :

@@ -65,6 +65,18 @@ describe("each app should have a valid config.json", async () => {
   }
 })
 
+describe("n8n-sandbox installation secrets", () => {
+  test("exposes the shared API key as a password field", async () => {
+    const fileContent = await getFile('n8n-sandbox', 'config.json')
+    const config = JSON.parse(fileContent || '{}')
+    const apiKey = config.form_fields?.find((field: { env_variable?: string }) => field.env_variable === 'SANDBOX_API_KEYS')
+
+    expect(apiKey?.type).toBe('password')
+    expect(apiKey?.required).toBe(true)
+    expect(apiKey?.min).toBeGreaterThanOrEqual(48)
+  })
+})
+
 describe("modern compose files preserve runtime semantics", () => {
   test("n8n-sandbox keeps its one-shot certificate service", async () => {
     const fileContent = await getFile('n8n-sandbox', 'docker-compose.yml')

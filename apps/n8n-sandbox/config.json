@@ -18,11 +18,11 @@
   "supported_architectures": ["amd64", "arm64"],
   "form_fields": [
     {
-      "type": "random",
-      "encoding": "hex",
+      "type": "password",
       "min": 48,
-      "label": "Cle API sandbox (SANDBOX_API_KEYS)",
-      "hint": "A recopier dans l'app n8n : N8N_SANDBOX_SERVICE_API_KEY. Plusieurs cles possibles, separees par des virgules.",
+      "max": 128,
+      "label": "Clé API partagée avec n8n (SANDBOX_API_KEYS)",
+      "hint": "Choisir une clé forte, puis recopier cette même valeur dans N8N_SANDBOX_SERVICE_API_KEY dans les paramètres de l'app n8n officielle.",
       "required": true,
       "env_variable": "SANDBOX_API_KEYS"
     },

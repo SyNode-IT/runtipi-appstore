@@ -7,64 +7,22 @@
       "hostname": "mediamtx",
       "isMain": true,
       "internalPort": "8889",
-      "environment": [
-        {
-          "key": "MTX_PROTOCOLS",
-          "value": "tcp"
-        },
-        {
-          "key": "MTX_LOGLEVEL",
-          "value": "info"
-        },
-        {
-          "key": "MTX_LOGDESTINATIONS",
-          "value": "stdout"
-        },
-        {
-          "key": "MTX_RTSPADDRESS",
-          "value": ":8554"
-        },
-        {
-          "key": "MTX_RTMPADDRESS",
-          "value": ":1935"
-        },
-        {
-          "key": "MTX_HLSADDRESS",
-          "value": ":8888"
-        },
-        {
-          "key": "MTX_WEBRTCADDRESS",
-          "value": ":8889"
-        },
-        {
-          "key": "MTX_SRTADDRESS",
-          "value": ":8890"
-        },
-        {
-          "key": "MTX_APIADDRESS",
-          "value": ":9997"
-        },
-        {
-          "key": "MTX_METRICSADDRESS",
-          "value": ":9998"
-        },
-        {
-          "key": "MTX_AUTHINTERNALUSERS",
-          "value": "${MTX_API_USERNAME:+${MTX_API_USERNAME}:${MTX_API_PASSWORD}}"
-        },
-        {
-          "key": "MTX_PATHDEFAULTS_RECORD",
-          "value": "${MTX_RECORD_ENABLED:-false}"
-        },
-        {
-          "key": "MTX_PATHDEFAULTS_RECORDPATH",
-          "value": "./recordings/%path/%Y-%m-%d_%H-%M-%S-%f"
-        },
-        {
-          "key": "MTX_PATHDEFAULTS_RECORDFORMAT",
-          "value": "fmp4"
-        }
-      ],
+      "environment": {
+        "MTX_PROTOCOLS": "tcp",
+        "MTX_LOGLEVEL": "info",
+        "MTX_LOGDESTINATIONS": "stdout",
+        "MTX_RTSPADDRESS": ":8554",
+        "MTX_RTMPADDRESS": ":1935",
+        "MTX_HLSADDRESS": ":8888",
+        "MTX_WEBRTCADDRESS": ":8889",
+        "MTX_SRTADDRESS": ":8890",
+        "MTX_APIADDRESS": ":9997",
+        "MTX_METRICSADDRESS": ":9998",
+        "MTX_AUTHINTERNALUSERS": "${MTX_API_USERNAME:+${MTX_API_USERNAME}:${MTX_API_PASSWORD}}",
+        "MTX_PATHDEFAULTS_RECORD": "${MTX_RECORD_ENABLED:-false}",
+        "MTX_PATHDEFAULTS_RECORDPATH": "./recordings/%path/%Y-%m-%d_%H-%M-%S-%f",
+        "MTX_PATHDEFAULTS_RECORDFORMAT": "fmp4"
+      },
       "addPorts": [
         {
           "containerPort": 8554,

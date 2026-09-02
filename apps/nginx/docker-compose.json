@@ -29,16 +29,10 @@
           "readOnly": true
         }
       ],
-      "environment": [
-        {
-          "key": "NGINX_HOST",
-          "value": "${NGINX_SERVER_NAME:-localhost}"
-        },
-        {
-          "key": "TZ",
-          "value": "${TZ:-Europe/Paris}"
-        }
-      ],
+      "environment": {
+        "NGINX_HOST": "${NGINX_SERVER_NAME:-localhost}",
+        "TZ": "${TZ:-Europe/Paris}"
+      },
       "healthCheck": {
         "test": "curl --fail http://localhost:80 || exit 1",
         "interval": "30s",

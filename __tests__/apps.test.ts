@@ -74,6 +74,7 @@ describe("n8n-sandbox installation secrets", () => {
     expect(apiKey?.type).toBe('password')
     expect(apiKey?.required).toBe(true)
     expect(apiKey?.min).toBeGreaterThanOrEqual(48)
+    expect(config.tipi_version).toBeGreaterThanOrEqual(2)
   })
 })
 

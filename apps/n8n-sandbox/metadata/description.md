@@ -35,7 +35,7 @@ services:
 
 Remplacer entièrement `<clé choisie lors de l’installation>` par la vraie clé, sans conserver les caractères `<` et `>`. Ne jamais publier cette valeur.
 
-Le port de `N8N_SANDBOX_SERVICE_URL` reste `8080` : il s'agit du port interne du service Docker, pas du port éventuellement choisi dans l'interface Runtipi.
+Le port de `N8N_SANDBOX_SERVICE_URL` reste `8080` : il s'agit du port interne du service Docker. Runtipi ne demande aucun port pour cette app, car elle n'en publie aucun sur l'hôte.
 
 Enregistrer la configuration, puis redémarrer l'application **n8n**. Pour vérifier la communication depuis son conteneur :
 

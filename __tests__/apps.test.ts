@@ -74,7 +74,8 @@ describe("n8n-sandbox installation secrets", () => {
     expect(apiKey?.type).toBe('password')
     expect(apiKey?.required).toBe(true)
     expect(apiKey?.min).toBeGreaterThanOrEqual(48)
-    expect(config.tipi_version).toBeGreaterThanOrEqual(2)
+    expect(config.port).toBeUndefined()
+    expect(config.tipi_version).toBeGreaterThanOrEqual(5)
   })
 })
 
@@ -84,6 +85,7 @@ describe("n8n-sandbox post-install documentation", () => {
 
     expect(description).toContain('services:\n  n8n-2:\n    environment:')
     expect(description).toContain('N8N_SANDBOX_SERVICE_URL=http://sandbox-api:8080')
+    expect(description).toContain("Runtipi ne demande aucun port pour cette app")
     expect(description).not.toContain('sandbox-api:<PORT')
     expect(description).toContain('N8N_SANDBOX_SERVICE_API_KEY=<clé choisie lors de l’installation>')
     expect(description).toContain('/opt/runtipi/app-data/migrated/searxng/data/settings.yml')

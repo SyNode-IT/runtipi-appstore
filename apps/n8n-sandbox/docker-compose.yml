@@ -32,24 +32,32 @@
 services:
   sandbox-certs:
     image: n8nio/n8n-sandbox-service-api:1.3.0
-    # Obligatoire sous Runtipi : sans cette ligne le builder injecte
-    # restart: unless-stopped et ce job one-shot boucle en redemarrage.
-    restart: "no"
+    # Runtipi considere l'app arretee si un seul de ses conteneurs est sorti.
+    # Le bootstrap reste donc actif et sain apres la generation idempotente.
+    restart: unless-stopped
     user: "0:0"
     entrypoint: ["sh", "-c"]
-    # Genere les certs (idempotent) puis fixe les droits pour l'utilisateur
-    # sandbox-api de l'image : /tls/api et le repertoire SQLite de l'API
-    # (en bind mount, Docker cree le dossier en root sinon).
+    # Genere les certs, fixe les droits pour sandbox-api, publie l'etat ready,
+    # puis reste actif sans ouvrir de port ni lancer de service reseau.
     command:
       - >
+        rm -f /tmp/certs-ready &&
         bootstrap-mtls.sh --out-dir /tls --api-san sandbox-api
         --control-san-prefix sandbox-runner &&
-        chown -R sandbox-api:sandbox-api /tls/api /var/lib/n8n-sandbox-api
+        chown -R sandbox-api:sandbox-api /tls/api /var/lib/n8n-sandbox-api &&
+        touch /tmp/certs-ready &&
+        exec tail -f /dev/null
     environment:
       NUM_RUNNERS: "1"
     volumes:
       - ${APP_DATA_DIR}/data/tls:/tls
       - ${APP_DATA_DIR}/data/api:/var/lib/n8n-sandbox-api
+    healthcheck:
+      test: "test -f /tmp/certs-ready"
+      interval: 5s
+      timeout: 2s
+      retries: 12
+      start_period: 5s
 
   sandbox-api:
     image: n8nio/n8n-sandbox-service-api:1.3.0
@@ -57,7 +65,7 @@ services:
 
     depends_on:
       sandbox-certs:
-        condition: service_completed_successfully
+        condition: service_healthy
 
     environment:
       SANDBOX_API_KEYS: "${SANDBOX_API_KEYS}"

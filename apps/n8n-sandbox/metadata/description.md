@@ -4,7 +4,7 @@ Sandbox auto-hébergé pour l'**AI Assistant** de n8n (configuration « Self-hos
 
 | Service | Rôle |
 |---|---|
-| `sandbox-certs` | Job one-shot : génère la CA privée et les certificats mTLS, puis s'arrête. |
+| `sandbox-certs` | Initialise la CA privée et les certificats mTLS, puis reste inactif et sain pour que Runtipi conserve l'app au statut « Démarré ». |
 | `sandbox-api` | Point d'entrée HTTP interne (`:8080`) que n8n appelle pour exécuter du code. |
 | `sandbox-runner-1` | Docker-in-Docker **privileged** : crée et exécute les conteneurs sandbox. |
 

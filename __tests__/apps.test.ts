@@ -92,14 +92,21 @@ describe("n8n-sandbox post-install documentation", () => {
 })
 
 describe("modern compose files preserve runtime semantics", () => {
-  test("n8n-sandbox keeps its one-shot certificate service", async () => {
+  test("n8n-sandbox keeps its certificate bootstrap healthy for Runtipi", async () => {
     const fileContent = await getFile('n8n-sandbox', 'docker-compose.yml')
     expect(fileContent).not.toBeNull()
 
     const parsed = YAML.parse(fileContent || '')
+    const certs = parsed.services?.['sandbox-certs']
+    const api = parsed.services?.['sandbox-api']
+
     expect(parsed['x-runtipi']?.schema_version).toBe(2)
-    expect(parsed.services?.['sandbox-certs']?.restart).toBe('no')
-    expect(parsed.services?.['sandbox-api']?.['x-runtipi']?.is_main).toBe(true)
+    expect(certs?.restart).toBe('unless-stopped')
+    expect(certs?.command?.join(' ')).toContain('touch /tmp/certs-ready')
+    expect(certs?.command?.join(' ')).toContain('tail -f /dev/null')
+    expect(certs?.healthcheck?.test).toContain('test -f /tmp/certs-ready')
+    expect(api?.depends_on?.['sandbox-certs']?.condition).toBe('service_healthy')
+    expect(api?.['x-runtipi']?.is_main).toBe(true)
     expect(parsed.services?.['sandbox-runner-1']?.environment?.SANDBOX_RUNNER_HTTP_BASE_URL).toBe('https://sandbox-runner-1:8080')
     expect(parsed.services?.['sandbox-runner-1']?.healthcheck?.test).toContain('https://localhost:8080/readyz')
   })

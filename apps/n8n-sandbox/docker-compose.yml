@@ -41,6 +41,7 @@ services:
     # puis reste actif sans ouvrir de port ni lancer de service reseau.
     command:
       - >
+        rm -f /tmp/certs-ready &&
         bootstrap-mtls.sh --out-dir /tls --api-san sandbox-api
         --control-san-prefix sandbox-runner &&
         chown -R sandbox-api:sandbox-api /tls/api /var/lib/n8n-sandbox-api &&

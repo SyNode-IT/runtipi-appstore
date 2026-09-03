@@ -101,9 +101,12 @@ describe("modern compose files preserve runtime semantics", () => {
     const api = parsed.services?.['sandbox-api']
 
     expect(parsed['x-runtipi']?.schema_version).toBe(2)
+    const certCommand = certs?.command?.join(' ') || ''
     expect(certs?.restart).toBe('unless-stopped')
-    expect(certs?.command?.join(' ')).toContain('touch /tmp/certs-ready')
-    expect(certs?.command?.join(' ')).toContain('tail -f /dev/null')
+    expect(certCommand).toContain('rm -f /tmp/certs-ready')
+    expect(certCommand).toContain('touch /tmp/certs-ready')
+    expect(certCommand).toContain('tail -f /dev/null')
+    expect(certCommand.indexOf('rm -f /tmp/certs-ready')).toBeLessThan(certCommand.indexOf('bootstrap-mtls.sh'))
     expect(certs?.healthcheck?.test).toContain('test -f /tmp/certs-ready')
     expect(api?.depends_on?.['sandbox-certs']?.condition).toBe('service_healthy')
     expect(api?.['x-runtipi']?.is_main).toBe(true)

@@ -78,6 +78,19 @@ describe("n8n-sandbox installation secrets", () => {
   })
 })
 
+describe("n8n-sandbox post-install documentation", () => {
+  test("documents the actual n8n override and optional SearXNG JSON setup", async () => {
+    const description = await getFile('n8n-sandbox', 'metadata/description.md')
+
+    expect(description).toContain('services:\n  n8n-2:\n    environment:')
+    expect(description).toContain('N8N_SANDBOX_SERVICE_URL=http://sandbox-api:8080')
+    expect(description).not.toContain('sandbox-api:<PORT')
+    expect(description).toContain('N8N_SANDBOX_SERVICE_API_KEY=<clé choisie lors de l’installation>')
+    expect(description).toContain('/opt/runtipi/app-data/migrated/searxng/data/settings.yml')
+    expect(description).toContain('- json')
+  })
+})
+
 describe("modern compose files preserve runtime semantics", () => {
   test("n8n-sandbox keeps its one-shot certificate service", async () => {
     const fileContent = await getFile('n8n-sandbox', 'docker-compose.yml')

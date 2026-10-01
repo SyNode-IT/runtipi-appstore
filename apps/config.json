@@ -1,0 +1,19 @@
+{
+  "name": "RustDesk Server",
+  "id": "rustdesk-server",
+  "available": true,
+  "exposable": false,
+  "no_gui": true,
+  "dynamic_config": true,
+  "tipi_version": 1,
+  "version": "1.1.16",
+  "categories": ["network", "utilities"],
+  "short_desc": "Serveur RustDesk auto-hébergé : annuaire d'ID (hbbs) et relais (hbbr).",
+  "description": "Serveur open source pour RustDesk, l'alternative auto-hébergée à TeamViewer/AnyDesk. hbbs gère l'annuaire d'ID et la mise en relation, hbbr relaie les sessions quand une connexion directe est impossible. Réseau en mode host, comme recommandé par RustDesk.",
+  "author": "RustDesk",
+  "source": "https://github.com/rustdesk/rustdesk-server",
+  "website": "https://rustdesk.com",
+  "form_fields": [],
+  "supported_architectures": ["amd64", "arm64"],
+  "min_tipi_version": "4.5.0"
+}

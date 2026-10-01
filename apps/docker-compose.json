@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "services": [
+    {
+      "name": "hbbs",
+      "image": "rustdesk/rustdesk-server:1.1.16",
+      "isMain": true,
+      "networkMode": "host",
+      "command": "hbbs",
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data",
+          "containerPath": "/root"
+        }
+      ],
+      "dependsOn": ["hbbr"]
+    },
+    {
+      "name": "hbbr",
+      "image": "rustdesk/rustdesk-server:1.1.16",
+      "networkMode": "host",
+      "command": "hbbr",
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data",
+          "containerPath": "/root"
+        }
+      ]
+    }
+  ]
+}

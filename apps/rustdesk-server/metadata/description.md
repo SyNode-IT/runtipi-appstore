@@ -18,6 +18,7 @@ Les deux services tournent en réseau `host` (recommandation officielle RustDesk
 | 21119 | TCP       | hbbr    | Client web (relais)                    |
 
 Ces ports ne passent pas par Traefik : redirigez-les directement (NAT) vers l'hôte Runtipi.
+> À l'installation, l'option **« Port ouvert »** n'a aucun effet (pas d'interface web à publier) : laissez-la décochée.
 
 ## Données
 

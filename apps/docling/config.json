@@ -8,7 +8,7 @@
   "exposable": false,
   "dynamic_config": true,
   "version": "1.37.0",
-  "tipi_version": 2,
+  "tipi_version": 3,
   "categories": [
     "ai",
     "utilities"
@@ -22,11 +22,13 @@
   ],
   "form_fields": [
     {
-      "type": "random",
+      "type": "password",
       "label": "Clé d'API Docling",
-      "min": 32,
-      "env_variable": "DOCLING_API_KEY",
-      "hint": "Générée automatiquement. À recopier dans Open WebUI, champ « Clé API » de Docling."
+      "hint": "Clé que Docling exigera (en-tête X-Api-Key). Choisis-la longue (24 caractères minimum) et colle la même dans Open WebUI > Réglages > Documents > Docling > Clé API.",
+      "min": 24,
+      "max": 128,
+      "required": true,
+      "env_variable": "DOCLING_API_KEY"
     }
   ]
 }

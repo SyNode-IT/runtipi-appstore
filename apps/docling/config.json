@@ -8,7 +8,7 @@
   "exposable": false,
   "dynamic_config": true,
   "version": "1.37.0",
-  "tipi_version": 3,
+  "tipi_version": 4,
   "categories": [
     "ai",
     "utilities"

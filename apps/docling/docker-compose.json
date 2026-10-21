@@ -17,7 +17,7 @@
         },
         {
           "key": "DOCLING_SERVE_MAX_SYNC_WAIT",
-          "value": "1800"
+          "value": "14400"
         },
         {
           "key": "UVICORN_WORKERS",

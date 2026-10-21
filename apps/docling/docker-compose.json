@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "services": [
+    {
+      "name": "docling",
+      "image": "quay.io/docling-project/docling-serve-cpu:v1.37.0",
+      "isMain": true,
+      "internalPort": "5001",
+      "environment": {
+        "DOCLING_SERVE_ENABLE_REMOTE_SERVICES": "true",
+        "DOCLING_SERVE_ENABLE_UI": "false",
+        "DOCLING_SERVE_MAX_SYNC_WAIT": "1800",
+        "UVICORN_WORKERS": "1",
+        "TZ": "${TZ:-Europe/Paris}"
+      }
+    }
+  ]
+}

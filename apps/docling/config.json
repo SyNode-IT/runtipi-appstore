@@ -1,0 +1,18 @@
+{
+  "name": "Docling",
+  "id": "docling",
+  "available": true,
+  "short_desc": "Extraction de documents pour Open WebUI, avec description des images par un modèle vision",
+  "author": "Docling Project (IBM Research)",
+  "port": 5001,
+  "exposable": false,
+  "dynamic_config": true,
+  "version": "1.37.0",
+  "tipi_version": 1,
+  "categories": ["ai", "utilities"],
+  "description": "Docling Serve convertit les PDF et documents bureautiques en texte structuré. Branché comme moteur d'extraction d'Open WebUI, il peut faire lire chaque page par un modèle vision d'Ollama pour que les images et schémas des PDF entrent dans les bases de connaissances.",
+  "source": "https://github.com/docling-project/docling-serve",
+  "website": "https://docling-project.github.io/docling/",
+  "supported_architectures": ["amd64", "arm64"],
+  "form_fields": []
+}

@@ -24,6 +24,10 @@
           "value": "1"
         },
         {
+          "key": "DOCLING_SERVE_ENG_LOC_NUM_WORKERS",
+          "value": "1"
+        },
+        {
           "key": "TZ",
           "value": "${TZ:-Europe/Paris}"
         },

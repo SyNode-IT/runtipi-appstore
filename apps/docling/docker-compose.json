@@ -11,7 +11,8 @@
         "DOCLING_SERVE_ENABLE_UI": "false",
         "DOCLING_SERVE_MAX_SYNC_WAIT": "1800",
         "UVICORN_WORKERS": "1",
-        "TZ": "${TZ:-Europe/Paris}"
+        "TZ": "${TZ:-Europe/Paris}",
+        "DOCLING_SERVE_API_KEY": "${DOCLING_API_KEY}"
       }
     }
   ]

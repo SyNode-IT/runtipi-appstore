@@ -6,14 +6,32 @@
       "image": "quay.io/docling-project/docling-serve-cpu:v1.37.0",
       "isMain": true,
       "internalPort": "5001",
-      "environment": {
-        "DOCLING_SERVE_ENABLE_REMOTE_SERVICES": "true",
-        "DOCLING_SERVE_ENABLE_UI": "false",
-        "DOCLING_SERVE_MAX_SYNC_WAIT": "1800",
-        "UVICORN_WORKERS": "1",
-        "TZ": "${TZ:-Europe/Paris}",
-        "DOCLING_SERVE_API_KEY": "${DOCLING_API_KEY}"
-      }
+      "environment": [
+        {
+          "key": "DOCLING_SERVE_ENABLE_REMOTE_SERVICES",
+          "value": "true"
+        },
+        {
+          "key": "DOCLING_SERVE_ENABLE_UI",
+          "value": "false"
+        },
+        {
+          "key": "DOCLING_SERVE_MAX_SYNC_WAIT",
+          "value": "1800"
+        },
+        {
+          "key": "UVICORN_WORKERS",
+          "value": "1"
+        },
+        {
+          "key": "TZ",
+          "value": "${TZ:-Europe/Paris}"
+        },
+        {
+          "key": "DOCLING_SERVE_API_KEY",
+          "value": "${DOCLING_API_KEY}"
+        }
+      ]
     }
   ]
 }
